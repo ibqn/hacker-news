@@ -8,3 +8,5 @@ export const signupSchema = z.object({
     .regex(/^[a-zA-Z0-9_]+$/),
   password: z.string().min(6),
 })
+
+export type SignupSchema = z.infer<typeof signupSchema>

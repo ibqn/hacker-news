@@ -1,3 +1,5 @@
+import type { SignupSchema } from "@/validators/signup"
+
 export type SuccessResponse<T = void> = {
   success: true
   message: string
@@ -8,3 +10,5 @@ export type ErrorResponse = {
   error: string
   isFormError?: boolean
 }
+
+export type UserData = Pick<SignupSchema, "username">

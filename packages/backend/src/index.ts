@@ -6,7 +6,7 @@ import { getErrorMessage, isFormError } from "@/utils/error"
 import type { Context } from "@/utils/context"
 import { validateSessionToken } from "@/lucia"
 import { deleteCookie, getCookie, setCookie } from "hono/cookie"
-import { authRouter } from "@/routes/auth"
+import { authRoute } from "@/routes/auth"
 import { cors } from "hono/cors"
 import { prettyJSON } from "hono/pretty-json"
 
@@ -16,12 +16,13 @@ app.use(prettyJSON())
 
 app.notFound((c) => c.json<ErrorResponse>({ error: "Not Found", success: false }, 404))
 
-authRouter.get("/", (c) => {
+app.get("/", (c) => {
   return c.json<SuccessResponse>({ success: true, message: "Hello Hono!" }, 201)
 })
 
 app.use("*", cors(), async (c, next) => {
   const token = getCookie(c, "session_token")
+  console.log("token", token)
   if (!token) {
     c.set("user", null)
     c.set("session", null)
@@ -31,9 +32,10 @@ app.use("*", cors(), async (c, next) => {
   const { session, user } = await validateSessionToken(token)
   if (session) {
     setCookie(c, "session_token", token)
-  } else {
-    deleteCookie(c, "session_token")
   }
+  // } else {
+  //   deleteCookie(c, "session_token")
+  // }
   c.set("session", session)
   c.set("user", user)
 
@@ -41,7 +43,7 @@ app.use("*", cors(), async (c, next) => {
 })
 
 const routes = app.basePath("/api")
-routes.route("/auth", authRouter)
+routes.route("/auth", authRoute)
 
 app.onError((error, c) => {
   // console.error(error)
