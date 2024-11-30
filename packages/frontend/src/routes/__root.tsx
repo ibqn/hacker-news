@@ -1,20 +1,24 @@
+import { Header } from '@/components/header'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
+import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
+import { format } from 'date-fns'
 
 export const Route = createRootRoute({
   component: () => (
     <>
-      <div className="flex gap-2 p-2">
-        <Link to="/" className="[&.active]:font-bold">
-          Home
-        </Link>{' '}
-        <Link to="/about" className="[&.active]:font-bold">
-          About
-        </Link>
+      <div className="bg-mainground flex min-h-screen flex-col text-foreground">
+        <Header />
+        <main className="container mx-auto grow p-4">
+          <Outlet />
+        </main>
+
+        <footer className="p-4 text-center">
+          <p className="text-sm text-muted-foreground">
+            &copy; {format(new Date(), 'yyyy')} hacker news
+          </p>
+        </footer>
       </div>
-      <hr />
-      <Outlet />
       <ReactQueryDevtools />
       <TanStackRouterDevtools />
     </>
