@@ -4,7 +4,7 @@ import { routeTree } from '@/route-tree.gen'
 import { queryClient } from '@/query-client'
 import { Loading } from '@/components/loading'
 import { NotFound } from '@/components/not-found'
-import { ErrorComponent } from '@/components/error-component'
+import { ErrorView } from '@/components/error-view'
 
 // Create a new router instance
 export const router = createRouter({
@@ -12,7 +12,7 @@ export const router = createRouter({
   context: { queryClient },
   defaultPendingComponent: Loading,
   defaultNotFoundComponent: NotFound,
-  defaultErrorComponent: ({ error }) => <ErrorComponent error={error} />,
+  defaultErrorComponent: ({ error }) => <ErrorView error={error} />,
 })
 
 // Register the router instance for type safety

@@ -15,7 +15,7 @@ type Props = {
   error: Error
 }
 
-export function ErrorComponent({ error }: Props) {
+export function ErrorView({ error }: Props) {
   const router = useRouter()
   const isDev = process.env.NODE_ENV !== 'production'
 
