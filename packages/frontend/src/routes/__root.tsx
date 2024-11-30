@@ -9,7 +9,7 @@ export const Route = createRootRoute({
     <>
       <div className="bg-mainground flex min-h-screen flex-col text-foreground">
         <Header />
-        <main className="container mx-auto grow p-4">
+        <main className="container mx-auto flex grow p-4">
           <Outlet />
         </main>
 
