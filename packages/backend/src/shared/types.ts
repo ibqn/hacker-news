@@ -1,4 +1,5 @@
-import type { SignupSchema } from "@/validators/signup"
+export type { ApiRoutes } from "../index"
+import type { SignupSchema } from "../validators/signup"
 
 export type SuccessResponse<T = void> = {
   success: true

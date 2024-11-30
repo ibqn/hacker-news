@@ -42,8 +42,7 @@ app.use("*", cors(), async (c, next) => {
   await next()
 })
 
-const routes = app.basePath("/api")
-routes.route("/auth", authRoute)
+export const routes = app.basePath("/api").route("/auth", authRoute)
 
 app.onError((error, c) => {
   // console.error(error)
@@ -72,3 +71,5 @@ serve({
   fetch: app.fetch,
   port,
 })
+
+export type ApiRoutes = typeof routes
