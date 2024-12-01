@@ -1,21 +1,30 @@
-import { hc } from 'hono/client'
+import { ClientResponse, hc } from 'hono/client'
 import type {
   ApiRoutes,
   SuccessResponse,
   ErrorResponse,
+  UserData,
 } from 'backend/src/shared/types'
+import type { SigninSchema } from 'backend/src/validators/signin'
+import { queryOptions } from '@tanstack/react-query'
 
-const client = hc<ApiRoutes>('/')
+const client = hc<ApiRoutes>('/', {
+  fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+    fetch(input, {
+      ...init,
+      credentials: 'include',
+    }),
+})
 
-export const postSignup = async (username: string, password: string) => {
+async function processApi<T = void>(
+  promise: Promise<ClientResponse<T>>
+): Promise<SuccessResponse<T> | ErrorResponse> {
   try {
-    const response = await client.api.auth.signin.$post({
-      form: { username, password },
-    })
+    const response = await promise
 
     if (response.ok) {
       const data = await response.json()
-      return data as SuccessResponse
+      return data as SuccessResponse<T>
     }
 
     const data = await response.json()
@@ -27,3 +36,17 @@ export const postSignup = async (username: string, password: string) => {
     } satisfies ErrorResponse as ErrorResponse
   }
 }
+
+export const postSignup = async (formData: SigninSchema) => {
+  return processApi(client.api.auth.signup.$post({ form: formData }))
+}
+
+export const getUser = async () => {
+  return processApi<UserData>(client.api.auth.user.$get({}))
+}
+
+export const userQueryOptions = () =>
+  queryOptions({
+    queryKey: ['user'],
+    queryFn: getUser,
+  })

@@ -36,7 +36,7 @@ const authRoute = new Hono<Context>()
     } catch (error) {
       // console.error("auth", error)
       if (error instanceof postgres.PostgresError && error.code === "23505") {
-        throw new HTTPException(409, { message: "Username already exists" })
+        throw new HTTPException(409, { message: "Username already exists", cause: { form: true } })
       } else {
         throw error
       }
