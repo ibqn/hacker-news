@@ -15,13 +15,16 @@ export const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-border/40 bg-primary/95 backdrop-blur supports-[backdrop-filter]:bg-primary/90">
       <div className="container mx-auto flex items-center justify-between p-4 text-primary-foreground">
-        <div className="flex items-center space-x-4">
-          <Link to="/" className="font-bold">
+        <div className="flex grow items-center space-x-4">
+          <Link to="/" className="justify-between font-bold">
             hacker news
           </Link>
 
           <NavMenu
-            navProps={{ className: 'hidden items-center md:flex text-sm' }}
+            navProps={{
+              className:
+                'hidden items-center grow justify-between md:flex text-sm',
+            }}
             ulProps={{ className: 'flex space-x-4' }}
           />
         </div>
@@ -45,7 +48,7 @@ export const Header = () => {
             </SheetHeader>
 
             <NavMenu
-              navProps={{ className: 'flex text-sm' }}
+              navProps={{ className: 'flex flex-col gap-4 text-sm' }}
               ulProps={{
                 className: 'flex flex-col space-y-2',
               }}

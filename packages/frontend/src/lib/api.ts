@@ -1,48 +1,35 @@
-import { ClientResponse, hc } from 'hono/client'
-import type {
-  ApiRoutes,
-  SuccessResponse,
-  ErrorResponse,
-  UserData,
-} from 'backend/src/shared/types'
+import { SuccessResponse, type UserData } from 'backend/src/shared/types'
 import type { SigninSchema } from 'backend/src/validators/signin'
 import { queryOptions } from '@tanstack/react-query'
+import axiosNative from 'axios'
 
-const client = hc<ApiRoutes>('/', {
-  fetch: (input: RequestInfo | URL, init?: RequestInit) =>
-    fetch(input, {
-      ...init,
-      credentials: 'include',
-    }),
-})
-
-async function processApi<T = void>(
-  promise: Promise<ClientResponse<T>>
-): Promise<SuccessResponse<T> | ErrorResponse> {
-  try {
-    const response = await promise
-
-    if (response.ok) {
-      const data = await response.json()
-      return data as SuccessResponse<T>
-    }
-
-    const data = await response.json()
-    return data as ErrorResponse
-  } catch (error) {
-    return {
-      success: false,
-      error: String(error),
-    } satisfies ErrorResponse as ErrorResponse
-  }
+const defaultOptions = {
+  baseURL: '/api',
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'multipart/form-data',
+  },
 }
 
+export const axios = axiosNative.create(defaultOptions)
+
 export const postSignup = async (formData: SigninSchema) => {
-  return processApi(client.api.auth.signup.$post({ form: formData }))
+  return axios.post('/auth/signup', formData)
+}
+
+export const postSignin = async (formData: SigninSchema) => {
+  return axios.post('/auth/signin', formData)
+}
+
+export const getSignout = async () => {
+  return axios.get('/auth/signout')
 }
 
 export const getUser = async () => {
-  return processApi<UserData>(client.api.auth.user.$get({}))
+  const { data: response } =
+    await axios.get<SuccessResponse<UserData>>('/auth/user')
+  const { data: user } = response
+  return user
 }
 
 export const userQueryOptions = () =>

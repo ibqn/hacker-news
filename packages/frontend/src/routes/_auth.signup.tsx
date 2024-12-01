@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { z } from 'zod'
-import { fallback, zodSearchValidator } from '@tanstack/router-zod-adapter'
+import { zodSearchValidator } from '@tanstack/router-zod-adapter'
 import { useForm } from '@tanstack/react-form'
 import { zodValidator } from '@tanstack/zod-form-adapter'
 import { signinSchema } from 'backend/src/validators/signin'
@@ -18,10 +18,11 @@ import { FieldInfo } from '@/components/field-info'
 import { Button } from '@/components/ui/button'
 import { postSignup } from '@/lib/api'
 import { toast } from 'sonner'
-
-const signupSearchSchema = z.object({
-  redirect: fallback(z.string(), '/').default('/'),
-})
+import { useMutation } from '@tanstack/react-query'
+import { queryClient } from '@/query-client'
+import { AxiosError } from 'axios'
+import { ErrorResponse } from 'backend/src/shared/types'
+import { searchSchema } from '@/validators/search'
 
 const signupSchema = signinSchema
   .merge(
@@ -34,9 +35,9 @@ const signupSchema = signinSchema
     path: ['confirm'],
   })
 
-export const Route = createFileRoute('/signup')({
+export const Route = createFileRoute('/_auth/signup')({
   component: Signup,
-  validateSearch: zodSearchValidator(signupSearchSchema),
+  validateSearch: zodSearchValidator(searchSchema),
 })
 
 function Signup() {
@@ -62,19 +63,32 @@ function Signup() {
     onSubmit: async ({ value }) => {
       const { username, password } = value
       console.log('submit', value)
-      const response = await postSignup({ username, password })
+      signup({ username, password })
+    },
+  })
 
-      if (response.success) {
-        await navigate({ to: search.redirect })
-        return
-      } else {
-        form.setErrorMap({
-          onSubmit: response.isFormError ? response.error : 'Signup failed!',
-        })
-        // if (!response.isFormError) {
-        toast.error('Signup failed', { description: response.error })
-        // }
+  const { mutate: signup } = useMutation({
+    mutationFn: postSignup,
+    onSuccess: async () => {
+      console.log('Signin success')
+      await queryClient.invalidateQueries({
+        queryKey: ['user'],
+      })
+
+      await navigate({ to: search.redirect })
+    },
+    onError: (error) => {
+      let message = 'Signup failed'
+
+      if (error instanceof AxiosError) {
+        const response = error.response?.data as ErrorResponse
+        message = response.error
       }
+
+      form.setErrorMap({
+        onSubmit: message,
+      })
+      toast.error('Signup failed', { description: message })
     },
   })
 

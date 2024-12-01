@@ -61,7 +61,7 @@ app.onError((error, c) => {
     return errorResponse
   }
 
-  return c.json<ErrorResponse>({ success: false, error: getErrorMessage(error) })
+  return c.json<ErrorResponse>({ success: false, error: getErrorMessage(error) }, 500)
 })
 
 const port = 3333
@@ -71,5 +71,3 @@ serve({
   fetch: app.fetch,
   port,
 })
-
-export type ApiRoutes = typeof routes

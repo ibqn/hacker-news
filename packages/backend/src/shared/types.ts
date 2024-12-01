@@ -1,4 +1,3 @@
-export type { ApiRoutes } from "../index"
 import type { SigninSchema } from "../validators/signin"
 
 export type SuccessResponse<T = void> = {
