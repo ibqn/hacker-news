@@ -1,7 +1,7 @@
 import type { Context } from "@/utils/context"
 import { Hono } from "hono"
 import { zValidator } from "@hono/zod-validator"
-import { signupSchema } from "@/validators/signup"
+import { signinSchema } from "@/validators/signin"
 import argon2 from "argon2"
 import { db } from "@/drizzle/db"
 import { userTable, type User } from "@/drizzle/schema/auth"
@@ -13,7 +13,7 @@ import { HTTPException } from "hono/http-exception"
 import { signedIn } from "@/middleware/signed-in"
 
 const authRoute = new Hono<Context>()
-  .post("/signup", zValidator("form", signupSchema), async (c) => {
+  .post("/signup", zValidator("form", signinSchema), async (c) => {
     const { username, password } = c.req.valid("form")
 
     const passwordHash = await argon2.hash(password)
@@ -42,7 +42,7 @@ const authRoute = new Hono<Context>()
       }
     }
   })
-  .post("/signin", zValidator("form", signupSchema), async (c) => {
+  .post("/signin", zValidator("form", signinSchema), async (c) => {
     const { username, password } = c.req.valid("form")
 
     const user = await db.query.user.findFirst({

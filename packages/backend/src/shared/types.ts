@@ -1,5 +1,5 @@
 export type { ApiRoutes } from "../index"
-import type { SignupSchema } from "../validators/signup"
+import type { SigninSchema } from "../validators/signin"
 
 export type SuccessResponse<T = void> = {
   success: true
@@ -12,4 +12,4 @@ export type ErrorResponse = {
   isFormError?: boolean
 }
 
-export type UserData = Pick<SignupSchema, "username">
+export type UserData = Pick<SigninSchema, "username">

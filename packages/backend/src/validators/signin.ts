@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const signupSchema = z.object({
+export const signinSchema = z.object({
   username: z
     .string()
     .min(3)
@@ -9,4 +9,4 @@ export const signupSchema = z.object({
   password: z.string().min(6),
 })
 
-export type SignupSchema = z.infer<typeof signupSchema>
+export type SigninSchema = z.infer<typeof signinSchema>
