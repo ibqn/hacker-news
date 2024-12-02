@@ -9,6 +9,7 @@ import { deleteCookie, getCookie, setCookie } from "hono/cookie"
 import { authRoute } from "@/routes/auth"
 import { cors } from "hono/cors"
 import { prettyJSON } from "hono/pretty-json"
+import { postRoute } from "@/routes/posts"
 
 const app = new Hono<Context>()
 
@@ -42,7 +43,7 @@ app.use("*", cors(), async (c, next) => {
   await next()
 })
 
-export const routes = app.basePath("/api").route("/auth", authRoute)
+export const routes = app.basePath("/api").route("/auth", authRoute).route("/posts", postRoute)
 
 app.onError((error, c) => {
   // console.error(error)

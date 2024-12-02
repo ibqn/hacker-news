@@ -1,4 +1,4 @@
-import { serial, text, integer, timestamp } from "drizzle-orm/pg-core"
+import { serial, text, integer, timestamp, uuid } from "drizzle-orm/pg-core"
 import { relations, type InferSelectModel } from "drizzle-orm"
 import { schema } from "@/drizzle/schema"
 import { userTable } from "@/drizzle/schema/auth"
@@ -9,7 +9,7 @@ import { z } from "zod"
 
 export const postsTable = schema.table("posts", {
   id: serial("id").primaryKey(),
-  userId: text("user_id").notNull(),
+  userId: uuid("user_id").notNull(),
   title: text("title").notNull(),
   url: text("url"),
   content: text("content"),

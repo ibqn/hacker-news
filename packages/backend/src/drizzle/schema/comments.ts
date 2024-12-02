@@ -1,4 +1,4 @@
-import { serial, text, integer, timestamp } from "drizzle-orm/pg-core"
+import { serial, text, integer, timestamp, uuid } from "drizzle-orm/pg-core"
 import { relations, type InferSelectModel } from "drizzle-orm"
 import { schema } from "@/drizzle/schema"
 import { userTable } from "@/drizzle/schema/auth"
@@ -7,7 +7,7 @@ import { commentUpvotesTable } from "@/drizzle/schema/upvotes"
 
 export const commentsTable = schema.table("comments", {
   id: serial("id").primaryKey(),
-  userId: text("user_id").notNull(),
+  userId: uuid("user_id").notNull(),
   postId: integer("post_id").notNull(),
   parentCommentId: integer("parent_comment_id"),
   content: text("content").notNull(),
