@@ -1,6 +1,6 @@
-import { z } from "zod"
 import { insertPostSchema } from "../drizzle/schema/posts"
 import type { SigninSchema } from "../validators/signin"
+import { insertCommentSchema } from "@/drizzle/schema/comments"
 
 export type SuccessResponse<T = void> = {
   success: true
@@ -26,23 +26,11 @@ export const createPostSchema = insertPostSchema
     path: ["url", "content"],
   })
 
-export const sortBySchema = z.enum(["points", "recent"])
-export const orderSchema = z.enum(["asc", "desc"])
-
-export const paginationSchema = z.object({
-  limit: z.coerce.number().optional().default(10),
-  page: z.coerce.number().optional().default(1),
-  sortedBy: sortBySchema.optional().default("recent"),
-  order: orderSchema.optional().default("desc"),
-  author: z.string().optional(),
-  site: z.string().optional(),
-})
-
-export type PaginationSchema = z.infer<typeof paginationSchema>
-
 export type PaginatedSuccessResponse<T> = SuccessResponse<T> & {
   pagination: {
     page: number
     totalPages: number
   }
 }
+
+export const createCommentSchema = insertCommentSchema.pick({ content: true })

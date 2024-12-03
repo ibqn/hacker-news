@@ -4,6 +4,8 @@ import { schema } from "@/drizzle/schema"
 import { userTable } from "@/drizzle/schema/auth"
 import { postsTable } from "@/drizzle/schema/posts"
 import { commentUpvotesTable } from "@/drizzle/schema/upvotes"
+import { createInsertSchema } from "drizzle-zod"
+import { z } from "zod"
 
 export const commentsTable = schema.table("comments", {
   id: serial("id").primaryKey(),
@@ -42,3 +44,7 @@ export const commentRelations = relations(commentsTable, ({ one, many }) => ({
   }),
   commentUpvotes: many(commentUpvotesTable, { relationName: "commentUpvotes" }),
 }))
+
+export const insertCommentSchema = createInsertSchema(commentsTable, {
+  content: z.string().min(3, { message: "Content should have at least 3 characters." }),
+})

@@ -1,11 +1,19 @@
 import { db } from "@/drizzle/db"
 import { type User } from "@/drizzle/schema/auth"
+import { commentsTable } from "@/drizzle/schema/comments"
 import { postsTable } from "@/drizzle/schema/posts"
 import { postUpvotesTable } from "@/drizzle/schema/upvotes"
 import { signedIn } from "@/middleware/signed-in"
 import { getPosts, getPostsCount, type Post } from "@/queries/post"
-import { createPostSchema, paginationSchema, type PaginatedSuccessResponse, type SuccessResponse } from "@/shared/types"
+import {
+  createCommentSchema,
+  createPostSchema,
+  type PaginatedSuccessResponse,
+  type SuccessResponse,
+} from "@/shared/types"
 import type { Context } from "@/utils/context"
+import { getISOFormatDateQuery } from "@/utils/format-date"
+import { paginationSchema } from "@/validators/pagination"
 import { paramIdSchema } from "@/validators/param"
 import { zValidator } from "@hono/zod-validator"
 import { and, eq, sql } from "drizzle-orm"
@@ -86,3 +94,49 @@ export const postRoute = new Hono<Context>()
       201
     )
   })
+  .post(
+    ":id/comment",
+    signedIn,
+    zValidator("param", paramIdSchema),
+    zValidator("form", createCommentSchema),
+    async (c) => {
+      const { id } = c.req.valid("param")
+      const user = c.get("user") as User
+      const { content } = c.req.valid("form")
+
+      const comment = await db.transaction(async (trx) => {
+        const [updated] = await trx
+          .update(postsTable)
+          .set({ commentCount: sql`${postsTable.commentCount}+1` })
+          .where(eq(postsTable.id, id))
+          .returning({ commentCount: postsTable.commentCount })
+
+        if (!updated) {
+          throw new HTTPException(404, { message: "Post not found" })
+        }
+
+        const [comment] = await trx
+          .insert(commentsTable)
+          .values({
+            postId: id,
+            userId: user.id,
+            content,
+          })
+          .returning({
+            id: commentsTable.id,
+            userId: commentsTable.userId,
+            postId: commentsTable.postId,
+            content: commentsTable.content,
+            points: commentsTable.points,
+            depth: commentsTable.depth,
+            parentCommentId: commentsTable.parentCommentId,
+            createdAt: getISOFormatDateQuery(commentsTable.createdAt).as("created_at"),
+            commentCount: commentsTable.commentCount,
+          })
+
+        return comment
+      })
+
+      return c.json<SuccessResponse<typeof comment>>({ success: true, message: "Comment created", data: comment }, 201)
+    }
+  )

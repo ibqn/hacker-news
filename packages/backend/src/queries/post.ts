@@ -2,7 +2,7 @@ import { db } from "@/drizzle/db"
 import { userTable, type User } from "@/drizzle/schema/auth"
 import { postsTable } from "@/drizzle/schema/posts"
 import { postUpvotesTable } from "@/drizzle/schema/upvotes"
-import type { PaginationSchema } from "@/shared/types"
+import type { PaginationSchema } from "@/validators/pagination"
 import { getISOFormatDateQuery } from "@/utils/format-date"
 import { and, asc, countDistinct, desc, eq, sql } from "drizzle-orm"
 
