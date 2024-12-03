@@ -1,12 +1,16 @@
 import { db } from "@/drizzle/db"
 import { type User } from "@/drizzle/schema/auth"
 import { postsTable } from "@/drizzle/schema/posts"
+import { postUpvotesTable } from "@/drizzle/schema/upvotes"
 import { signedIn } from "@/middleware/signed-in"
 import { getPosts, getPostsCount, type Post } from "@/queries/post"
 import { createPostSchema, paginationSchema, type PaginatedSuccessResponse, type SuccessResponse } from "@/shared/types"
 import type { Context } from "@/utils/context"
+import { paramIdSchema } from "@/validators/param"
 import { zValidator } from "@hono/zod-validator"
+import { and, eq, sql } from "drizzle-orm"
 import { Hono } from "hono"
+import { HTTPException } from "hono/http-exception"
 
 export const postRoute = new Hono<Context>()
   .post("/", signedIn, zValidator("form", createPostSchema), async (c) => {
@@ -24,7 +28,7 @@ export const postRoute = new Hono<Context>()
       .returning({ id: postsTable.id })
 
     return c.json<SuccessResponse<{ id: number }>>(
-      { success: true, message: "Hello World", data: { id: post.id } },
+      { success: true, message: "Post created", data: { id: post.id } },
       201
     )
   })
@@ -43,5 +47,42 @@ export const postRoute = new Hono<Context>()
         pagination: { page, totalPages: Math.ceil(count / limit) },
       },
       200
+    )
+  })
+  .post(":id/upvote", signedIn, zValidator("param", paramIdSchema), async (c) => {
+    const { id } = c.req.valid("param")
+    const user = c.get("user") as User
+
+    const upvoteData = await db.transaction(async (trx) => {
+      const [existingUpvote] = await trx
+        .select()
+        .from(postUpvotesTable)
+        .where(and(eq(postUpvotesTable.postId, id), eq(postUpvotesTable.userId, user.id)))
+        .limit(1)
+
+      const pointChange = existingUpvote ? -1 : 1
+
+      const [updated] = await trx
+        .update(postsTable)
+        .set({ points: sql`${postsTable.points}+${pointChange}` })
+        .where(eq(postsTable.id, id))
+        .returning({ points: postsTable.points })
+
+      if (!updated) {
+        throw new HTTPException(404, { message: "Post not found" })
+      }
+
+      if (existingUpvote) {
+        await trx.delete(postUpvotesTable).where(eq(postUpvotesTable.postId, id))
+      } else {
+        await trx.insert(postUpvotesTable).values({ postId: id, userId: user.id })
+      }
+
+      return { points: updated.points, isUpvoted: !existingUpvote }
+    })
+
+    return c.json<SuccessResponse<{ points: number; isUpvoted: boolean }>>(
+      { success: true, message: "Post upvote successful", data: upvoteData },
+      201
     )
   })
