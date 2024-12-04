@@ -31,10 +31,8 @@ const authRoute = new Hono<Context>()
       const session = await createSession(token, user.id)
 
       setCookie(c, "session_token", token)
-      // console.log("User created", user)
       return c.json<SuccessResponse>({ success: true, message: "User created" }, 201)
     } catch (error) {
-      // console.error("auth", error)
       if (error instanceof postgres.PostgresError && error.code === "23505") {
         throw new HTTPException(409, { message: "Username already exists", cause: { form: true } })
       } else {

@@ -33,9 +33,10 @@ app.use("*", cors(), async (c, next) => {
   const { session, user } = await validateSessionToken(token)
   if (session) {
     setCookie(c, "session_token", token)
-  } else {
-    deleteCookie(c, "session_token")
   }
+  // else {
+  //   deleteCookie(c, "session_token")
+  // }
   c.set("session", session)
   c.set("user", user)
 
