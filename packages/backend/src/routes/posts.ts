@@ -1,10 +1,9 @@
 import { db } from "@/drizzle/db"
 import { type User } from "@/drizzle/schema/auth"
-import { commentsTable } from "@/drizzle/schema/comments"
 import { postsTable } from "@/drizzle/schema/posts"
 import { postUpvotesTable } from "@/drizzle/schema/upvotes"
 import { signedIn } from "@/middleware/signed-in"
-import { getCommentsCount, getComments, type Comment } from "@/queries/comment"
+import { getCommentsCount, getComments, type Comment, createCommentForPost } from "@/queries/comment"
 import { getPost, getPosts, getPostsCount, type Post } from "@/queries/post"
 import {
   createCommentSchema,
@@ -47,11 +46,11 @@ export const postRoute = new Hono<Context>()
     const { count } = await getPostsCount({ author, site })
     const posts = await getPosts({ limit, page, sortedBy, order, author, site, user })
 
-    return c.json<PaginatedSuccessResponse<{ posts: Post[] }>>(
+    return c.json<PaginatedSuccessResponse<Post[]>>(
       {
         success: true,
         message: "Posts fetched successfully",
-        data: { posts },
+        data: posts,
         pagination: { page, totalPages: Math.ceil(count / limit) },
       },
       200
@@ -104,49 +103,13 @@ export const postRoute = new Hono<Context>()
       const user = c.get("user") as User
       const { content } = c.req.valid("form")
 
-      const comment = await db.transaction(async (trx) => {
-        const [updated] = await trx
-          .update(postsTable)
-          .set({ commentCount: sql`${postsTable.commentCount}+1` })
-          .where(eq(postsTable.id, id))
-          .returning({ commentCount: postsTable.commentCount })
-
-        if (!updated) {
-          throw new HTTPException(404, { message: "Post not found" })
-        }
-
-        const [comment] = await trx
-          .insert(commentsTable)
-          .values({
-            postId: id,
-            userId: user.id,
-            content,
-          })
-          .returning({
-            id: commentsTable.id,
-            userId: commentsTable.userId,
-            postId: commentsTable.postId,
-            content: commentsTable.content,
-            points: commentsTable.points,
-            depth: commentsTable.depth,
-            parentCommentId: commentsTable.parentCommentId,
-            createdAt: commentsTable.createdAt,
-            commentCount: commentsTable.commentCount,
-          })
-
-        return comment
-      })
+      const comment = await createCommentForPost({ id, content, user })
 
       return c.json<SuccessResponse<Comment>>(
         {
           success: true,
           message: "Comment created",
-          data: {
-            ...comment,
-            author: { username: user.username, id: user.id },
-            commentUpvotes: [],
-            childComments: [],
-          } satisfies Comment as Comment,
+          data: comment,
         },
         201
       )
@@ -158,14 +121,13 @@ export const postRoute = new Hono<Context>()
     const user = c.get("user")
 
     const { count } = await getCommentsCount({ postId: id })
-
     const comments = await getComments({ postId: id, limit, page, sortedBy, order, includeChildren, user })
 
-    return c.json<PaginatedSuccessResponse<{ comments: Comment[] }>>(
+    return c.json<PaginatedSuccessResponse<Comment[]>>(
       {
         success: true,
         message: "Comments fetched successfully",
-        data: { comments },
+        data: comments,
         pagination: { page, totalPages: Math.ceil(count / limit) },
       },
       200

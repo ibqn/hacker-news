@@ -93,3 +93,111 @@ export const getComments = async ({
 }
 
 export type Comment = Awaited<ReturnType<typeof getComments>>[number]
+
+type CreateCommentOptions = {
+  id: number
+  content: string
+  user: User
+}
+
+export const createCommentForComment = async ({ id: commentId, content, user }: CreateCommentOptions) => {
+  const comment = await db.transaction(async (trx) => {
+    const [parentComment] = await trx
+      .select({ id: commentsTable.id, postId: commentsTable.postId, depth: commentsTable.depth })
+      .from(commentsTable)
+      .where(eq(commentsTable.id, commentId))
+      .limit(1)
+
+    if (!parentComment) {
+      throw new HTTPException(404, { message: "Comment not found" })
+    }
+
+    const [updatedParentComment] = await trx
+      .update(commentsTable)
+      .set({ commentCount: sql`${commentsTable.commentCount} + 1` })
+      .where(eq(commentsTable.id, parentComment.id))
+      .returning({ commentCount: commentsTable.commentCount })
+
+    const [updatedPost] = await trx
+      .update(postsTable)
+      .set({ commentCount: sql`${postsTable.commentCount} + 1` })
+      .where(eq(postsTable.id, parentComment.postId))
+      .returning({ commentCount: postsTable.commentCount })
+
+    if (!updatedParentComment || !updatedPost) {
+      throw new HTTPException(500, { message: "Failed to update comment count" })
+    }
+
+    const [comment] = await trx
+      .insert(commentsTable)
+      .values({
+        userId: user.id,
+        postId: parentComment.postId,
+        depth: parentComment.depth + 1,
+        parentCommentId: parentComment.id,
+        content,
+      })
+      .returning({
+        id: commentsTable.id,
+        userId: commentsTable.userId,
+        postId: commentsTable.postId,
+        depth: commentsTable.depth,
+        parentCommentId: commentsTable.parentCommentId,
+        points: commentsTable.points,
+        content: commentsTable.content,
+        commentCount: commentsTable.commentCount,
+        createdAt: commentsTable.createdAt,
+      })
+
+    return comment
+  })
+
+  return {
+    ...comment,
+    author: { id: user.id, username: user.username },
+    commentUpvotes: [],
+    childComments: [],
+  } satisfies Comment as Comment
+}
+
+export const createCommentForPost = async ({ id: postId, content, user }: CreateCommentOptions) => {
+  const comment = await db.transaction(async (trx) => {
+    const [updated] = await trx
+      .update(postsTable)
+      .set({ commentCount: sql`${postsTable.commentCount}+1` })
+      .where(eq(postsTable.id, postId))
+      .returning({ commentCount: postsTable.commentCount })
+
+    if (!updated) {
+      throw new HTTPException(404, { message: "Post not found" })
+    }
+
+    const [comment] = await trx
+      .insert(commentsTable)
+      .values({
+        postId: postId,
+        userId: user.id,
+        content,
+      })
+      .returning({
+        id: commentsTable.id,
+        userId: commentsTable.userId,
+        postId: commentsTable.postId,
+        content: commentsTable.content,
+        points: commentsTable.points,
+        depth: commentsTable.depth,
+        parentCommentId: commentsTable.parentCommentId,
+        createdAt: commentsTable.createdAt,
+        commentCount: commentsTable.commentCount,
+      })
+
+    return comment
+  })
+
+  return {
+    ...comment,
+    author: { username: user.username, id: user.id },
+    commentUpvotes: [],
+    childComments: [],
+  } satisfies Comment as Comment
+}
