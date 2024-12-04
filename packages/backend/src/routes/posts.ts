@@ -1,19 +1,14 @@
-import { db } from "@/drizzle/db"
 import { type User } from "@/drizzle/schema/auth"
-import { postsTable } from "@/drizzle/schema/posts"
 import { signedIn } from "@/middleware/signed-in"
 import { getCommentsCount, getComments, type Comment, createCommentForPost } from "@/queries/comment"
-import { getPost, getPosts, getPostsCount, type Post } from "@/queries/post"
+import { createPost, getPost, getPosts, getPostsCount, type Post } from "@/queries/post"
 import { createPostUpvote, type UpvoteData } from "@/queries/upvote"
-import {
-  createCommentSchema,
-  createPostSchema,
-  type PaginatedSuccessResponse,
-  type SuccessResponse,
-} from "@/shared/types"
+import { type PaginatedSuccessResponse, type SuccessResponse } from "@/shared/types"
 import type { Context } from "@/utils/context"
+import { createCommentSchema } from "@/validators/comment"
 import { commentsPaginationSchema, paginationSchema } from "@/validators/pagination"
 import { paramIdSchema } from "@/validators/param"
+import { createPostSchema } from "@/validators/post"
 import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
 import { HTTPException } from "hono/http-exception"
@@ -23,20 +18,9 @@ export const postRoute = new Hono<Context>()
     const { title, url, content } = c.req.valid("form")
     const user = c.get("user") as User
 
-    const [post] = await db
-      .insert(postsTable)
-      .values({
-        userId: user.id,
-        title,
-        url,
-        content,
-      })
-      .returning({ id: postsTable.id })
+    const post = await createPost({ title, url, content, user })
 
-    return c.json<SuccessResponse<{ id: number }>>(
-      { success: true, message: "Post created", data: { id: post.id } },
-      201
-    )
+    return c.json<SuccessResponse<Post>>({ success: true, message: "Post created", data: post }, 201)
   })
   .get("/", zValidator("query", paginationSchema), async (c) => {
     const { limit, page, sortedBy, order, author, site } = c.req.valid("query")

@@ -3,6 +3,7 @@ import { userTable, type User } from "@/drizzle/schema/auth"
 import { postsTable } from "@/drizzle/schema/posts"
 import { postUpvotesTable } from "@/drizzle/schema/upvotes"
 import type { PaginationSchema } from "@/validators/pagination"
+import type { CreatePostSchema } from "@/validators/post"
 import { and, asc, countDistinct, desc, eq, sql } from "drizzle-orm"
 
 type GetPostsCountOptions = Pick<PaginationSchema, "author" | "site">
@@ -103,4 +104,34 @@ export const getPost = async ({ postId, user }: GetPostOptions) => {
 
   const [post] = await postQuery
   return post
+}
+
+type CreatePostOptions = CreatePostSchema & {
+  user: User
+}
+
+export const createPost = async ({ title, url, content, user }: CreatePostOptions) => {
+  const [post] = await db
+    .insert(postsTable)
+    .values({
+      userId: user.id,
+      title,
+      url,
+      content,
+    })
+    .returning({
+      id: postsTable.id,
+      title: postsTable.title,
+      url: postsTable.url,
+      content: postsTable.content,
+      createdAt: postsTable.createdAt,
+      points: postsTable.points,
+      commentCount: postsTable.commentCount,
+    })
+
+  return {
+    ...post,
+    author: { id: user.id, username: user.username },
+    isUpvoted: false,
+  } satisfies Post as Post
 }
