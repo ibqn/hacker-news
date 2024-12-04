@@ -10,6 +10,7 @@ import { authRoute } from "@/routes/auth"
 import { cors } from "hono/cors"
 import { prettyJSON } from "hono/pretty-json"
 import { postRoute } from "@/routes/posts"
+import { commentRoute } from "@/routes/comments"
 
 const app = new Hono<Context>()
 
@@ -43,7 +44,11 @@ app.use("*", cors(), async (c, next) => {
   await next()
 })
 
-export const routes = app.basePath("/api").route("/auth", authRoute).route("/posts", postRoute)
+export const routes = app
+  .basePath("/api")
+  .route("/auth", authRoute)
+  .route("/posts", postRoute)
+  .route("/comments", commentRoute)
 
 app.onError((error, c) => {
   // console.error(error)
