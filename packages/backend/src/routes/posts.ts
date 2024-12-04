@@ -1,10 +1,10 @@
 import { db } from "@/drizzle/db"
 import { type User } from "@/drizzle/schema/auth"
 import { postsTable } from "@/drizzle/schema/posts"
-import { postUpvotesTable } from "@/drizzle/schema/upvotes"
 import { signedIn } from "@/middleware/signed-in"
 import { getCommentsCount, getComments, type Comment, createCommentForPost } from "@/queries/comment"
 import { getPost, getPosts, getPostsCount, type Post } from "@/queries/post"
+import { createPostUpvote, type UpvoteData } from "@/queries/upvote"
 import {
   createCommentSchema,
   createPostSchema,
@@ -15,7 +15,6 @@ import type { Context } from "@/utils/context"
 import { commentsPaginationSchema, paginationSchema } from "@/validators/pagination"
 import { paramIdSchema } from "@/validators/param"
 import { zValidator } from "@hono/zod-validator"
-import { and, eq, sql } from "drizzle-orm"
 import { Hono } from "hono"
 import { HTTPException } from "hono/http-exception"
 
@@ -60,38 +59,9 @@ export const postRoute = new Hono<Context>()
     const { id } = c.req.valid("param")
     const user = c.get("user") as User
 
-    const upvoteData = await db.transaction(async (trx) => {
-      const [existingUpvote] = await trx
-        .select()
-        .from(postUpvotesTable)
-        .where(and(eq(postUpvotesTable.postId, id), eq(postUpvotesTable.userId, user.id)))
-        .limit(1)
+    const upvoteData = await createPostUpvote({ id, user })
 
-      const pointChange = existingUpvote ? -1 : 1
-
-      const [updated] = await trx
-        .update(postsTable)
-        .set({ points: sql`${postsTable.points}+${pointChange}` })
-        .where(eq(postsTable.id, id))
-        .returning({ points: postsTable.points })
-
-      if (!updated) {
-        throw new HTTPException(404, { message: "Post not found" })
-      }
-
-      if (existingUpvote) {
-        await trx.delete(postUpvotesTable).where(eq(postUpvotesTable.postId, id))
-      } else {
-        await trx.insert(postUpvotesTable).values({ postId: id, userId: user.id })
-      }
-
-      return { points: updated.points, isUpvoted: !existingUpvote }
-    })
-
-    return c.json<SuccessResponse<{ points: number; isUpvoted: boolean }>>(
-      { success: true, message: "Post upvote successful", data: upvoteData },
-      201
-    )
+    return c.json<SuccessResponse<UpvoteData>>({ success: true, message: "Post upvoted", data: upvoteData }, 201)
   })
   .post(
     ":id/comment",
@@ -105,14 +75,7 @@ export const postRoute = new Hono<Context>()
 
       const comment = await createCommentForPost({ id, content, user })
 
-      return c.json<SuccessResponse<Comment>>(
-        {
-          success: true,
-          message: "Comment created",
-          data: comment,
-        },
-        201
-      )
+      return c.json<SuccessResponse<Comment>>({ success: true, message: "Comment created", data: comment }, 201)
     }
   )
   .get(":id/comments", zValidator("param", paramIdSchema), zValidator("query", commentsPaginationSchema), async (c) => {
