@@ -14,6 +14,10 @@ export const paginationSchema = z.object({
 
 export type PaginationSchema = z.infer<typeof paginationSchema>
 
-export const commentsPaginationSchema = paginationSchema.extend({
-  includeChildren: z.coerce.boolean().optional().default(false),
-})
+export const commentsPaginationSchema = paginationSchema
+  .extend({
+    includeChildren: z.coerce.boolean().optional().default(false),
+  })
+  .omit({ site: true })
+
+export type CommentPaginationSchema = z.infer<typeof commentsPaginationSchema>
