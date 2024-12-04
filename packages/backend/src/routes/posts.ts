@@ -4,6 +4,7 @@ import { commentsTable } from "@/drizzle/schema/comments"
 import { postsTable } from "@/drizzle/schema/posts"
 import { postUpvotesTable } from "@/drizzle/schema/upvotes"
 import { signedIn } from "@/middleware/signed-in"
+import { getCommentsCount, getComments, type Comment } from "@/queries/comment"
 import { getPosts, getPostsCount, type Post } from "@/queries/post"
 import {
   createCommentSchema,
@@ -13,7 +14,7 @@ import {
 } from "@/shared/types"
 import type { Context } from "@/utils/context"
 import { getISOFormatDateQuery } from "@/utils/format-date"
-import { paginationSchema } from "@/validators/pagination"
+import { commentsPaginationSchema, paginationSchema } from "@/validators/pagination"
 import { paramIdSchema } from "@/validators/param"
 import { zValidator } from "@hono/zod-validator"
 import { and, eq, sql } from "drizzle-orm"
@@ -140,3 +141,22 @@ export const postRoute = new Hono<Context>()
       return c.json<SuccessResponse<typeof comment>>({ success: true, message: "Comment created", data: comment }, 201)
     }
   )
+  .get(":id/comments", zValidator("param", paramIdSchema), zValidator("query", commentsPaginationSchema), async (c) => {
+    const { limit, page, sortedBy, order, includeChildren } = c.req.valid("query")
+    const { id } = c.req.valid("param")
+    const user = c.get("user")
+
+    const { count } = await getCommentsCount({ postId: id })
+
+    const comments = await getComments({ postId: id, limit, page, sortedBy, order, includeChildren, user })
+
+    return c.json<PaginatedSuccessResponse<{ comments: Comment[] }>>(
+      {
+        success: true,
+        message: "Comments fetched successfully",
+        data: { comments },
+        pagination: { page, totalPages: Math.ceil(count / limit) },
+      },
+      200
+    )
+  })
