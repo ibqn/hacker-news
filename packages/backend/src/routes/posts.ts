@@ -13,7 +13,6 @@ import {
   type SuccessResponse,
 } from "@/shared/types"
 import type { Context } from "@/utils/context"
-import { getISOFormatDateQuery } from "@/utils/format-date"
 import { commentsPaginationSchema, paginationSchema } from "@/validators/pagination"
 import { paramIdSchema } from "@/validators/param"
 import { zValidator } from "@hono/zod-validator"
@@ -131,14 +130,26 @@ export const postRoute = new Hono<Context>()
             points: commentsTable.points,
             depth: commentsTable.depth,
             parentCommentId: commentsTable.parentCommentId,
-            createdAt: getISOFormatDateQuery(commentsTable.createdAt).as("created_at"),
+            createdAt: commentsTable.createdAt,
             commentCount: commentsTable.commentCount,
           })
 
         return comment
       })
 
-      return c.json<SuccessResponse<typeof comment>>({ success: true, message: "Comment created", data: comment }, 201)
+      return c.json<SuccessResponse<Comment>>(
+        {
+          success: true,
+          message: "Comment created",
+          data: {
+            ...comment,
+            author: { username: user.username, id: user.id },
+            commentUpvotes: [],
+            childComments: [],
+          } satisfies Comment as Comment,
+        },
+        201
+      )
     }
   )
   .get(":id/comments", zValidator("param", paramIdSchema), zValidator("query", commentsPaginationSchema), async (c) => {

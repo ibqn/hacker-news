@@ -3,7 +3,6 @@ import type { User } from "@/drizzle/schema/auth"
 import { commentsTable } from "@/drizzle/schema/comments"
 import { postsTable } from "@/drizzle/schema/posts"
 import { commentUpvotesTable } from "@/drizzle/schema/upvotes"
-import { getISOFormatDateQuery } from "@/utils/format-date"
 import type { CommentPaginationSchema } from "@/validators/pagination"
 import { and, asc, countDistinct, desc, eq, isNull, sql } from "drizzle-orm"
 import { HTTPException } from "hono/http-exception"
@@ -86,13 +85,7 @@ export const getComments = async ({
           }),
         },
         orderBy: sortOrder,
-        extras: {
-          createdAt: getISOFormatDateQuery(commentsTable.createdAt).as("created_at"),
-        },
       },
-    },
-    extras: {
-      createdAt: getISOFormatDateQuery(commentsTable.createdAt).as("created_at"),
     },
   })
 

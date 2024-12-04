@@ -1,14 +1,19 @@
 import { text, timestamp, uuid } from "drizzle-orm/pg-core"
 import { relations, type InferSelectModel } from "drizzle-orm"
 import { schema } from "@/drizzle/schema"
-import { postsTable } from "./posts"
-import { commentsTable } from "./comments"
+import { postsTable } from "@/drizzle/schema/posts"
+import { commentsTable } from "@/drizzle/schema/comments"
 import { commentUpvotesTable, postUpvotesTable } from "./upvotes"
 
 export const userTable = schema.table("user", {
   id: uuid("id").primaryKey().defaultRandom(),
   username: text("username").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
+  createdAt: timestamp("created_at", {
+    withTimezone: true,
+  })
+    .notNull()
+    .defaultNow(),
 })
 
 export const userRelations = relations(userTable, ({ many }) => ({
@@ -25,7 +30,6 @@ export const sessionTable = schema.table("session", {
     .references(() => userTable.id, { onDelete: "cascade" }),
   expiresAt: timestamp("expires_at", {
     withTimezone: true,
-    mode: "date",
   }).notNull(),
 })
 

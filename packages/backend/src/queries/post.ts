@@ -3,7 +3,6 @@ import { userTable, type User } from "@/drizzle/schema/auth"
 import { postsTable } from "@/drizzle/schema/posts"
 import { postUpvotesTable } from "@/drizzle/schema/upvotes"
 import type { PaginationSchema } from "@/validators/pagination"
-import { getISOFormatDateQuery } from "@/utils/format-date"
 import { and, asc, countDistinct, desc, eq, sql } from "drizzle-orm"
 
 type GetPostsCountOptions = Pick<PaginationSchema, "author" | "site">
@@ -43,7 +42,7 @@ export const getPosts = async ({ limit, page, sortedBy, order, author, site, use
       url: postsTable.url,
       content: postsTable.content,
       points: postsTable.points,
-      createdAt: getISOFormatDateQuery(postsTable.createdAt),
+      createdAt: postsTable.createdAt,
       commentCount: postsTable.commentCount,
       author: { id: userTable.id, username: userTable.username },
       isUpvoted: user

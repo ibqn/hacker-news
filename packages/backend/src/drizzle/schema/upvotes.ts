@@ -1,5 +1,5 @@
 import { serial, integer, timestamp, uuid } from "drizzle-orm/pg-core"
-import { relations, type InferSelectModel } from "drizzle-orm"
+import { relations } from "drizzle-orm"
 import { schema } from "@/drizzle/schema"
 import { postsTable } from "@/drizzle/schema/posts"
 import { userTable } from "@/drizzle/schema/auth"
@@ -11,7 +11,6 @@ export const postUpvotesTable = schema.table("post_upvotes", {
   postId: integer("post_id").notNull(),
   createdAt: timestamp("created_at", {
     withTimezone: true,
-    mode: "date",
   })
     .notNull()
     .defaultNow(),
@@ -36,7 +35,6 @@ export const commentUpvotesTable = schema.table("comment_upvotes", {
   commentId: integer("comment_id").notNull(),
   createdAt: timestamp("created_at", {
     withTimezone: true,
-    mode: "date",
   })
     .notNull()
     .defaultNow(),
