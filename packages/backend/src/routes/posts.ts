@@ -5,7 +5,7 @@ import { postsTable } from "@/drizzle/schema/posts"
 import { postUpvotesTable } from "@/drizzle/schema/upvotes"
 import { signedIn } from "@/middleware/signed-in"
 import { getCommentsCount, getComments, type Comment } from "@/queries/comment"
-import { getPosts, getPostsCount, type Post } from "@/queries/post"
+import { getPost, getPosts, getPostsCount, type Post } from "@/queries/post"
 import {
   createCommentSchema,
   createPostSchema,
@@ -170,4 +170,16 @@ export const postRoute = new Hono<Context>()
       },
       200
     )
+  })
+  .get(":id", zValidator("param", paramIdSchema), async (c) => {
+    const { id } = c.req.valid("param")
+    const user = c.get("user")
+
+    const post = await getPost({ postId: id, user })
+
+    if (!post) {
+      throw new HTTPException(404, { message: "Post not found" })
+    }
+
+    return c.json<SuccessResponse<Post>>({ success: true, message: "Post fetched successfully", data: post }, 200)
   })
