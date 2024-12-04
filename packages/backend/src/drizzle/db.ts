@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js"
 import { z } from "zod"
-import { userTable, sessionTable, sessionRelations } from "@/drizzle/schema/auth"
+import { userTable, sessionTable, sessionRelations, userRelations } from "@/drizzle/schema/auth"
 import { postRelations, postsTable } from "@/drizzle/schema/posts"
 import { commentRelations, commentsTable } from "@/drizzle/schema/comments"
 import {
@@ -21,6 +21,7 @@ export const db = drizzle(processEnv.DATABASE_URL, {
     user: userTable,
     session: sessionTable,
     sessionRelations,
+    userRelations,
     posts: postsTable,
     comments: commentsTable,
     commentUpvotes: commentUpvotesTable,
