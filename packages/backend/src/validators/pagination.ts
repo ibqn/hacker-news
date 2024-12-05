@@ -18,6 +18,6 @@ export const commentsPaginationSchema = paginationSchema
   .extend({
     includeChildren: z.coerce.boolean().optional().default(false),
   })
-  .omit({ site: true })
+  .omit({ site: true, author: true })
 
 export type CommentPaginationSchema = z.infer<typeof commentsPaginationSchema>

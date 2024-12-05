@@ -1,6 +1,6 @@
 import { type User } from "@/drizzle/schema/auth"
 import { signedIn } from "@/middleware/signed-in"
-import { getCommentsCount, getComments, type Comment, createCommentForPost } from "@/queries/comment"
+import { getCommentsCountForPost, getCommentsForPost, type Comment, createCommentForPost } from "@/queries/comment"
 import { createPost, getPost, getPosts, getPostsCount, type Post } from "@/queries/post"
 import { createPostUpvote, type UpvoteData } from "@/queries/upvote"
 import { type PaginatedSuccessResponse, type SuccessResponse } from "@/shared/types"
@@ -67,8 +67,8 @@ export const postRoute = new Hono<Context>()
     const { id } = c.req.valid("param")
     const user = c.get("user")
 
-    const { count } = await getCommentsCount({ postId: id })
-    const comments = await getComments({ postId: id, limit, page, sortedBy, order, includeChildren, user })
+    const { count } = await getCommentsCountForPost({ id })
+    const comments = await getCommentsForPost({ id, limit, page, sortedBy, order, includeChildren, user })
 
     return c.json<PaginatedSuccessResponse<Comment[]>>(
       {

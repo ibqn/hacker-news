@@ -1,5 +1,5 @@
 import { db } from "@/drizzle/db"
-import type { User } from "@/drizzle/schema/auth"
+import { userTable, type User } from "@/drizzle/schema/auth"
 import { commentsTable } from "@/drizzle/schema/comments"
 import { postsTable } from "@/drizzle/schema/posts"
 import { commentUpvotesTable } from "@/drizzle/schema/upvotes"
@@ -8,10 +8,10 @@ import { and, asc, countDistinct, desc, eq, isNull, sql } from "drizzle-orm"
 import { HTTPException } from "hono/http-exception"
 
 type GetCommentsCountOptions = {
-  postId: number
+  id: number
 }
 
-export const getCommentsCount = async ({ postId }: GetCommentsCountOptions) => {
+export const getCommentsCountForPost = async ({ id: postId }: GetCommentsCountOptions) => {
   const [count] = await db
     .select({ count: countDistinct(commentsTable.id) })
     .from(commentsTable)
@@ -21,12 +21,12 @@ export const getCommentsCount = async ({ postId }: GetCommentsCountOptions) => {
 }
 
 type GetCommentsOptions = CommentPaginationSchema & {
-  postId: number
+  id: number
   user?: User | null
 }
 
-export const getComments = async ({
-  postId,
+export const getCommentsForPost = async ({
+  id: postId,
   limit,
   page,
   sortedBy,
@@ -92,7 +92,7 @@ export const getComments = async ({
   return comments
 }
 
-export type Comment = Awaited<ReturnType<typeof getComments>>[number]
+export type Comment = Awaited<ReturnType<typeof getCommentsForPost>>[number]
 
 type CreateCommentOptions = {
   id: number
@@ -200,4 +200,116 @@ export const createCommentForPost = async ({ id: postId, content, user }: Create
     commentUpvotes: [],
     childComments: [],
   } satisfies Comment as Comment
+}
+
+export const getCommentsCountForComment = async ({ id: commentId }: GetCommentsCountOptions) => {
+  const [count] = await db
+    .select({ count: countDistinct(commentsTable.id) })
+    .from(commentsTable)
+    .where(eq(commentsTable.parentCommentId, commentId))
+
+  return count
+}
+
+export const getCommentsForComment = async ({
+  id: commentId,
+  limit,
+  page,
+  sortedBy,
+  order,
+  includeChildren,
+  user,
+}: GetCommentsOptions) => {
+  const offset = (page - 1) * limit
+  const sortByColumn = sortedBy === "points" ? commentsTable.points : commentsTable.createdAt
+  const sortOrder = order === "desc" ? desc(sortByColumn) : asc(sortByColumn)
+
+  const [commentExists] = await db
+    .select({ exists: sql<boolean>`true` })
+    .from(commentsTable)
+    .where(eq(commentsTable.id, commentId))
+    .limit(1)
+
+  if (!commentExists) {
+    throw new HTTPException(404, { message: "Comment not found" })
+  }
+
+  const comments = await db.query.comments.findMany({
+    where: ({ parentCommentId }, { eq }) => eq(parentCommentId, commentId),
+    orderBy: sortOrder,
+    limit,
+    offset,
+    with: {
+      author: {
+        columns: {
+          username: true,
+          id: true,
+        },
+      },
+      ...(user && {
+        commentUpvotes: {
+          where: eq(commentUpvotesTable.userId, user.id),
+          columns: { userId: true },
+          limit: 1,
+        },
+      }),
+      childComments: {
+        limit: includeChildren ? 3 : 0,
+        with: {
+          author: {
+            columns: {
+              username: true,
+              id: true,
+            },
+          },
+          ...(user && {
+            commentUpvotes: {
+              where: eq(commentUpvotesTable.userId, user.id),
+              columns: { userId: true },
+              limit: 1,
+            },
+          }),
+        },
+        orderBy: sortOrder,
+      },
+    },
+  })
+
+  return comments
+}
+
+type GetCommentOptions = {
+  commentId: number
+  user?: User | null
+}
+
+export const getComment = async ({ commentId, user }: GetCommentOptions) => {
+  const [comment] = await db
+    .select({
+      id: commentsTable.id,
+      userId: commentsTable.userId,
+      postId: commentsTable.postId,
+      depth: commentsTable.depth,
+      parentCommentId: commentsTable.parentCommentId,
+      points: commentsTable.points,
+      content: commentsTable.content,
+      commentCount: commentsTable.commentCount,
+      createdAt: commentsTable.createdAt,
+      author: { id: userTable.id, username: userTable.username },
+    })
+    .from(commentsTable)
+    .leftJoin(userTable, eq(commentsTable.userId, userTable.id))
+    .where(eq(commentsTable.id, commentId))
+    .limit(1)
+
+  let commentUpvotes: { userId: string }[] = []
+  if (user) {
+    commentUpvotes = await db
+      .select({ userId: commentUpvotesTable.userId })
+      .from(commentUpvotesTable)
+      .where(and(eq(commentUpvotesTable.commentId, commentId), eq(commentUpvotesTable.userId, user.id)))
+      .limit(1)
+  }
+
+  return { ...comment, commentUpvotes, childComments: [] } satisfies Comment as Comment
 }
