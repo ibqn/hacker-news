@@ -1,5 +1,5 @@
 import { db } from "@/drizzle/db"
-import { userTable, type User } from "@/drizzle/schema/auth"
+import { type User } from "@/drizzle/schema/auth"
 import { commentsTable } from "@/drizzle/schema/comments"
 import { postsTable } from "@/drizzle/schema/posts"
 import { commentUpvotesTable } from "@/drizzle/schema/upvotes"
