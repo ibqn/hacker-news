@@ -281,35 +281,50 @@ export const getCommentsForComment = async ({
 type GetCommentOptions = {
   commentId: number
   user?: User | null
+  includeChildren?: boolean
 }
 
-export const getComment = async ({ commentId, user }: GetCommentOptions) => {
-  const [comment] = await db
-    .select({
-      id: commentsTable.id,
-      userId: commentsTable.userId,
-      postId: commentsTable.postId,
-      depth: commentsTable.depth,
-      parentCommentId: commentsTable.parentCommentId,
-      points: commentsTable.points,
-      content: commentsTable.content,
-      commentCount: commentsTable.commentCount,
-      createdAt: commentsTable.createdAt,
-      author: { id: userTable.id, username: userTable.username },
-    })
-    .from(commentsTable)
-    .leftJoin(userTable, eq(commentsTable.userId, userTable.id))
-    .where(eq(commentsTable.id, commentId))
-    .limit(1)
+export const getComment = async ({ commentId, user, includeChildren = false }: GetCommentOptions) => {
+  const comment = await db.query.comments.findFirst({
+    where: ({ id }, { eq }) => eq(id, commentId),
+    with: {
+      author: {
+        columns: {
+          username: true,
+          id: true,
+        },
+      },
+      ...(user && {
+        commentUpvotes: {
+          where: eq(commentUpvotesTable.userId, user.id),
+          columns: { userId: true },
+          limit: 1,
+        },
+      }),
+      childComments: {
+        limit: includeChildren ? 3 : 0,
+        with: {
+          author: {
+            columns: {
+              username: true,
+              id: true,
+            },
+          },
+          ...(user && {
+            commentUpvotes: {
+              where: eq(commentUpvotesTable.userId, user.id),
+              columns: { userId: true },
+              limit: 1,
+            },
+          }),
+        },
+      },
+    },
+  })
 
-  let commentUpvotes: { userId: string }[] = []
-  if (user) {
-    commentUpvotes = await db
-      .select({ userId: commentUpvotesTable.userId })
-      .from(commentUpvotesTable)
-      .where(and(eq(commentUpvotesTable.commentId, commentId), eq(commentUpvotesTable.userId, user.id)))
-      .limit(1)
+  if (!comment) {
+    throw new HTTPException(404, { message: "Comment not found" })
   }
 
-  return { ...comment, commentUpvotes, childComments: [] } satisfies Comment as Comment
+  return comment satisfies Comment
 }

@@ -11,7 +11,7 @@ import { createCommentUpvote, type UpvoteData } from "@/queries/upvote"
 import { type PaginatedSuccessResponse, type SuccessResponse } from "@/shared/types"
 import type { Context } from "@/utils/context"
 import { createCommentSchema } from "@/validators/comment"
-import { commentsPaginationSchema, paginationSchema } from "@/validators/pagination"
+import { commentQuerySchema, commentsPaginationSchema, paginationSchema } from "@/validators/pagination"
 import { paramIdSchema } from "@/validators/param"
 import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
@@ -57,11 +57,12 @@ export const commentRoute = new Hono<Context>()
       )
     }
   )
-  .get("/:id", zValidator("param", paramIdSchema), async (c) => {
+  .get("/:id", zValidator("param", paramIdSchema), zValidator("query", commentQuerySchema), async (c) => {
     const { id } = c.req.valid("param")
     const user = c.get("user")
+    const { includeChildren } = c.req.valid("query")
 
-    const comment = await getComment({ commentId: id, user })
+    const comment = await getComment({ commentId: id, user, includeChildren })
 
     return c.json<SuccessResponse<Comment>>(
       { success: true, message: "Comment fetched successfully", data: comment },
