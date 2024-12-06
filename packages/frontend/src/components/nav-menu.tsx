@@ -26,10 +26,7 @@ export const NavMenu = ({ navProps = {}, ulProps = {} }: Props) => {
 
   const { mutate: signout } = useMutation({
     mutationFn: getSignout,
-    onSuccess: async () => {
-      queryClient.setQueryData(['user'], null)
-    },
-    onError: () => {
+    onSettled: async () => {
       queryClient.setQueryData(['user'], null)
     },
   })
