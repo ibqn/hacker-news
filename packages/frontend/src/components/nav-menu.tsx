@@ -23,15 +23,14 @@ const links: NavLinks[] = [
 
 export const NavMenu = ({ navProps = {}, ulProps = {} }: Props) => {
   const { data: user } = useQuery(userQueryOptions())
-  console.log('user', user)
 
   const { mutate: signout } = useMutation({
     mutationFn: getSignout,
     onSuccess: async () => {
       queryClient.setQueryData(['user'], null)
-      // await queryClient.invalidateQueries({
-      //   queryKey: ['user'],
-      // })
+    },
+    onError: () => {
+      queryClient.setQueryData(['user'], null)
     },
   })
 
