@@ -1,7 +1,15 @@
-import { SuccessResponse, type UserData } from 'backend/src/shared/types'
+import {
+  type PaginatedSuccessResponse,
+  type SuccessResponse,
+  type UserData,
+} from 'backend/src/shared/types'
+import { type Post } from 'backend/src/queries/post'
 import type { SigninSchema } from 'backend/src/validators/signin'
+import type { PaginationSchema } from 'backend/src/validators/pagination'
 import { queryOptions } from '@tanstack/react-query'
 import axiosNative from 'axios'
+import { PostSearchSchema } from '@/validators/post-search'
+import { infiniteQueryOptions } from '@tanstack/react-query'
 
 const defaultOptions = {
   baseURL: '/api',
@@ -37,3 +45,35 @@ export const userQueryOptions = () =>
     queryKey: ['user'],
     queryFn: getUser,
   })
+
+export const getPosts = async (params: PaginationSchema) => {
+  const { data: response } = await axios.get<PaginatedSuccessResponse<Post[]>>(
+    '/posts',
+    { params }
+  )
+  const { data: posts, pagination } = response
+  return { posts, pagination }
+}
+
+export const postsInfiniteQueryOptions = (queryOptions: PostSearchSchema) => {
+  const { sortedBy, order, author = '', site = '' } = queryOptions
+  return infiniteQueryOptions({
+    queryKey: ['posts', sortedBy, order, author, site],
+    queryFn: ({ pageParam }) =>
+      getPosts({
+        page: Number(pageParam),
+        limit: 10,
+        sortedBy,
+        order,
+        author,
+        site,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages, lastPageParam) => {
+      if (lastPage.pagination.totalPages <= lastPageParam) {
+        return undefined
+      }
+      return lastPageParam + 1
+    },
+  })
+}

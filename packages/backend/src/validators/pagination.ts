@@ -1,12 +1,16 @@
 import { z } from "zod"
 
-export const sortBySchema = z.enum(["points", "recent"])
+export const sortedByValues = ["points", "recent"] as const
+export const sortedBySchema = z.enum(sortedByValues)
+export type SortedBySchema = z.infer<typeof sortedBySchema>
+
 export const orderSchema = z.enum(["asc", "desc"])
+export type OrderSchema = z.infer<typeof orderSchema>
 
 export const paginationSchema = z.object({
   limit: z.coerce.number().optional().default(10),
   page: z.coerce.number().optional().default(1),
-  sortedBy: sortBySchema.optional().default("recent"),
+  sortedBy: sortedBySchema.optional().default("recent"),
   order: orderSchema.optional().default("desc"),
   author: z.string().optional(),
   site: z.string().optional(),
