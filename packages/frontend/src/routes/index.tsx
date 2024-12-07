@@ -1,5 +1,6 @@
 import { PostCard } from '@/components/post-card'
 import { SortBar } from '@/components/sort-bar'
+import { Button } from '@/components/ui/button'
 import { postsInfiniteQueryOptions } from '@/lib/api'
 import { postSearchSchema } from '@/validators/post-search'
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query'
@@ -26,6 +27,19 @@ function Index() {
         {data.pages.map((page) =>
           page.posts.map((post) => <PostCard key={post.id} post={post} />)
         )}
+      </div>
+
+      <div className="mt-6">
+        <Button
+          onClick={() => fetchNextPage()}
+          disabled={!hasNextPage || isFetchingNextPage}
+        >
+          {isFetchingNextPage
+            ? 'Loading more...'
+            : hasNextPage
+              ? 'Load more'
+              : 'Nothing more to load'}
+        </Button>
       </div>
     </div>
   )
