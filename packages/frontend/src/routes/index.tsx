@@ -1,6 +1,7 @@
 import { PostCard } from '@/components/post-card'
 import { SortBar } from '@/components/sort-bar'
 import { Button } from '@/components/ui/button'
+import { useUpvotePost } from '@/hooks/use-upvote-post'
 import { postsInfiniteQueryOptions } from '@/lib/api'
 import { postSearchSchema } from '@/validators/post-search'
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query'
@@ -18,6 +19,8 @@ function Index() {
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useSuspenseInfiniteQuery(postsInfiniteQueryOptions(searchParams))
 
+  const upvoteMutation = useUpvotePost()
+
   return (
     <div className="mx-auto flex max-w-3xl grow flex-col p-4">
       <h1 className="mb-6 text-2xl font-bold text-foreground">Submissions</h1>
@@ -25,7 +28,15 @@ function Index() {
 
       <div className="space-y-4">
         {data.pages.map((page) =>
-          page.posts.map((post) => <PostCard key={post.id} post={post} />)
+          page.posts.map((post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              onUpvote={() => {
+                upvoteMutation.mutate(post.id)
+              }}
+            />
+          ))
         )}
       </div>
 

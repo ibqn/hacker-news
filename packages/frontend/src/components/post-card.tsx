@@ -9,9 +9,10 @@ import { formatDistanceToNow } from 'date-fns'
 
 type Props = {
   post: Post
+  onUpvote?: () => void
 }
 
-export function PostCard({ post }: Props) {
+export function PostCard({ post, onUpvote }: Props) {
   const {
     id,
     isUpvoted,
@@ -29,6 +30,9 @@ export function PostCard({ post }: Props) {
   return (
     <Card className="flex grow items-start justify-start border-border/25 pt-3">
       <Button
+        onClick={() => {
+          onUpvote?.()
+        }}
         variant="ghost"
         className={cn(
           'ml-3 flex h-auto flex-col items-center justify-center text-muted-foreground hover:text-primary',

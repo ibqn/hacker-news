@@ -8,8 +8,9 @@ import type { SigninSchema } from 'backend/src/validators/signin'
 import type { PaginationSchema } from 'backend/src/validators/pagination'
 import { queryOptions } from '@tanstack/react-query'
 import axiosNative from 'axios'
-import { PostSearchSchema } from '@/validators/post-search'
+import type { PostSearchSchema } from '@/validators/post-search'
 import { infiniteQueryOptions } from '@tanstack/react-query'
+import type { UpvoteData } from 'backend/src/queries/upvote'
 
 const defaultOptions = {
   baseURL: '/api',
@@ -54,6 +55,7 @@ export const getPosts = async (params: PaginationSchema) => {
   const { data: posts, pagination } = response
   return { posts, pagination }
 }
+export type GetPosts = Awaited<ReturnType<typeof getPosts>>
 
 export const postsInfiniteQueryOptions = (queryOptions: PostSearchSchema) => {
   const { sortedBy, order, author = '', site = '' } = queryOptions
@@ -76,4 +78,12 @@ export const postsInfiniteQueryOptions = (queryOptions: PostSearchSchema) => {
       return lastPageParam + 1
     },
   })
+}
+
+export const upvotePost = async (postId: number) => {
+  const { data: response } = await axios.post<SuccessResponse<UpvoteData>>(
+    `/posts/${postId}/upvote`
+  )
+  const { data: upvoteData } = response
+  return upvoteData
 }
