@@ -55,7 +55,7 @@ export function PostCard({ post, onUpvote }: Props) {
               </LinkComp.type>
             </CardTitle>
 
-            {post.url && (
+            {url && (
               <Link
                 className={cn(
                   badgeVariants({ variant: 'secondary' }),
@@ -78,9 +78,9 @@ export function PostCard({ post, onUpvote }: Props) {
               <Link
                 className="hover:underline"
                 to={'/'}
-                search={{ author: author.id }}
+                search={{ author: author?.id }}
               >
-                {author.username}
+                {author?.username}
               </Link>
             </span>
             <span>·</span>
