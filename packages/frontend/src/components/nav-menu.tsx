@@ -18,7 +18,7 @@ type NavLinks = {
 const links: NavLinks[] = [
   { name: 'new', href: '/about' },
   { name: 'top', href: '/about' },
-  { name: 'submit', href: '/about' },
+  { name: 'submit', href: '/submit' },
 ]
 
 export const NavMenu = ({ navProps = {}, ulProps = {} }: Props) => {
