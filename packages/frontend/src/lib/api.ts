@@ -11,6 +11,7 @@ import axiosNative from 'axios'
 import type { PostSearchSchema } from '@/validators/post-search'
 import { infiniteQueryOptions } from '@tanstack/react-query'
 import type { UpvoteData } from 'backend/src/queries/upvote'
+import type { CreatePostSchema } from 'backend/src/validators/post'
 
 const defaultOptions = {
   baseURL: '/api',
@@ -86,4 +87,14 @@ export const upvotePost = async (postId: number) => {
   )
   const { data: upvoteData } = response
   return upvoteData
+}
+
+export const postSubmit = async (postForm: CreatePostSchema) => {
+  // throw new Error('Not implemented')
+  const { data: response } = await axios.post<SuccessResponse<UpvoteData>>(
+    `/posts`,
+    postForm
+  )
+  const { data: postData } = response
+  return postData
 }
