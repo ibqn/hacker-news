@@ -1,8 +1,8 @@
 import { text, timestamp, uuid } from "drizzle-orm/pg-core"
 import { relations, type InferSelectModel } from "drizzle-orm"
-import { schema } from "@/drizzle/schema"
-import { postsTable } from "@/drizzle/schema/posts"
-import { commentsTable } from "@/drizzle/schema/comments"
+import { schema } from "../schema"
+import { postsTable } from "../schema/posts"
+import { commentsTable } from "../schema/comments"
 import { commentUpvotesTable, postUpvotesTable } from "./upvotes"
 
 export const userTable = schema.table("user", {

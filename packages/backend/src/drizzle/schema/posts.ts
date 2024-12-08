@@ -1,9 +1,9 @@
 import { serial, text, integer, timestamp, uuid } from "drizzle-orm/pg-core"
 import { relations } from "drizzle-orm"
-import { schema } from "@/drizzle/schema"
-import { userTable } from "@/drizzle/schema/auth"
-import { postUpvotesTable } from "@/drizzle/schema/upvotes"
-import { commentsTable } from "@/drizzle/schema/comments"
+import { schema } from "../schema"
+import { userTable } from "../schema/auth"
+import { postUpvotesTable } from "../schema/upvotes"
+import { commentsTable } from "../schema/comments"
 import { createInsertSchema } from "drizzle-zod"
 import { z } from "zod"
 
@@ -24,7 +24,7 @@ export const postsTable = schema.table("posts", {
 
 export const insertPostSchema = createInsertSchema(postsTable, {
   title: z.string().min(3, { message: "Title should have at least 3 characters." }),
-  url: z.string().trim().url({ message: "URL must be valid." }).optional(),
+  url: z.string().trim().url({ message: "URL must be valid." }).optional().or(z.literal("")),
   content: z.string().optional(),
 })
 

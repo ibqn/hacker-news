@@ -1,4 +1,4 @@
-import { insertPostSchema } from "@/drizzle/schema/posts"
+import { insertPostSchema } from "../drizzle/schema/posts"
 import type { z } from "zod"
 
 export const createPostSchema = insertPostSchema

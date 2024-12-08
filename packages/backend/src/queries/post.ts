@@ -1,9 +1,9 @@
-import { db } from "@/drizzle/db"
-import { userTable, type User } from "@/drizzle/schema/auth"
-import { postsTable } from "@/drizzle/schema/posts"
-import { postUpvotesTable } from "@/drizzle/schema/upvotes"
-import type { PaginationSchema } from "@/validators/pagination"
-import type { CreatePostSchema } from "@/validators/post"
+import { db } from "../drizzle/db"
+import { userTable, type User } from "../drizzle/schema/auth"
+import { postsTable } from "../drizzle/schema/posts"
+import { postUpvotesTable } from "../drizzle/schema/upvotes"
+import type { PaginationSchema } from "../validators/pagination"
+import type { CreatePostSchema } from "../validators/post"
 import { and, asc, countDistinct, desc, eq, sql } from "drizzle-orm"
 
 type GetPostsCountOptions = Pick<PaginationSchema, "author" | "site">

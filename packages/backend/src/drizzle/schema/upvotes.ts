@@ -1,9 +1,9 @@
 import { serial, integer, timestamp, uuid } from "drizzle-orm/pg-core"
 import { relations } from "drizzle-orm"
-import { schema } from "@/drizzle/schema"
-import { postsTable } from "@/drizzle/schema/posts"
-import { userTable } from "@/drizzle/schema/auth"
-import { commentsTable } from "@/drizzle/schema/comments"
+import { schema } from "../schema"
+import { postsTable } from "../schema/posts"
+import { userTable } from "../schema/auth"
+import { commentsTable } from "../schema/comments"
 
 export const postUpvotesTable = schema.table("post_upvotes", {
   id: serial("id").primaryKey(),

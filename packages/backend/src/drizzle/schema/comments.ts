@@ -1,9 +1,9 @@
 import { serial, text, integer, timestamp, uuid } from "drizzle-orm/pg-core"
 import { relations } from "drizzle-orm"
-import { schema } from "@/drizzle/schema"
-import { userTable } from "@/drizzle/schema/auth"
-import { postsTable } from "@/drizzle/schema/posts"
-import { commentUpvotesTable } from "@/drizzle/schema/upvotes"
+import { schema } from "../schema"
+import { userTable } from "../schema/auth"
+import { postsTable } from "../schema/posts"
+import { commentUpvotesTable } from "../schema/upvotes"
 import { createInsertSchema } from "drizzle-zod"
 import { z } from "zod"
 

@@ -1,4 +1,4 @@
-import { insertCommentSchema } from "@/drizzle/schema/comments"
+import { insertCommentSchema } from "../drizzle/schema/comments"
 import type { z } from "zod"
 
 export const createCommentSchema = insertCommentSchema.pick({ content: true })
