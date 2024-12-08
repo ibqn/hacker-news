@@ -12,6 +12,7 @@ import type { PostSearchSchema } from '@/validators/post-search'
 import { infiniteQueryOptions } from '@tanstack/react-query'
 import type { UpvoteData } from 'backend/src/queries/upvote'
 import type { CreatePostSchema } from 'backend/src/validators/post'
+import type { ParamIdSchema } from 'backend/src/validators/param'
 
 const defaultOptions = {
   baseURL: '/api',
@@ -98,3 +99,19 @@ export const postSubmit = async (postForm: CreatePostSchema) => {
   const { data: postData } = response
   return postData
 }
+
+export const getPost = async (param: ParamIdSchema) => {
+  const { data: response } = await axios.get<SuccessResponse<Post>>(
+    `/posts/${param.id}`
+  )
+  const { data: post } = response
+  return post
+}
+
+export const postQueryOptions = (postId: number) =>
+  queryOptions({
+    queryKey: ['post', postId],
+    queryFn: () => getPost({ id: postId }),
+    retry: false,
+    throwOnError: true,
+  })
