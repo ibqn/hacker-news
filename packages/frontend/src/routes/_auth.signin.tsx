@@ -48,7 +48,6 @@ function Signin() {
       onChange: signinSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log('submit', value)
       signin(value)
     },
   })
