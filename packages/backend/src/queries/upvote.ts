@@ -1,8 +1,8 @@
-import { db } from "@/drizzle/db"
-import type { User } from "@/drizzle/schema/auth"
-import { commentsTable } from "@/drizzle/schema/comments"
-import { postsTable } from "@/drizzle/schema/posts"
-import { commentUpvotesTable, postUpvotesTable } from "@/drizzle/schema/upvotes"
+import { db } from "../drizzle/db"
+import type { User } from "../drizzle/schema/auth"
+import { commentsTable } from "../drizzle/schema/comments"
+import { postsTable } from "../drizzle/schema/posts"
+import { commentUpvotesTable, postUpvotesTable } from "../drizzle/schema/upvotes"
 import { and, eq, sql } from "drizzle-orm"
 import { HTTPException } from "hono/http-exception"
 

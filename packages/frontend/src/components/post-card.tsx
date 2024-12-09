@@ -86,7 +86,7 @@ export function PostCard({ post, onUpvote }: Props) {
             <span>·</span>
             <span>{formatDistanceToNow(createdAt, { addSuffix: true })}</span>
             <span>·</span>
-            <Link to={'/post'} search={{ id }} className="hover:underline">
+            <Link to={`/post/${id}`} className="hover:underline">
               {commentCount} comments
             </Link>
           </div>

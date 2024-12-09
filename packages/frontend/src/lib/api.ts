@@ -5,14 +5,18 @@ import {
 } from 'backend/src/shared/types'
 import { type Post } from 'backend/src/queries/post'
 import type { SigninSchema } from 'backend/src/validators/signin'
-import type { PaginationSchema } from 'backend/src/validators/pagination'
+import type {
+  CommentPaginationSchema,
+  PaginationSchema,
+} from 'backend/src/validators/pagination'
 import { queryOptions } from '@tanstack/react-query'
 import axiosNative from 'axios'
 import type { PostSearchSchema } from '@/validators/post-search'
 import { infiniteQueryOptions } from '@tanstack/react-query'
 import type { UpvoteData } from 'backend/src/queries/upvote'
 import type { CreatePostSchema } from 'backend/src/validators/post'
-import type { ParamIdSchema } from 'backend/src/validators/param'
+import type { Comment } from 'backend/src/queries/comment'
+import { CommentSearchSchema } from '@/validators/comment-search'
 
 const defaultOptions = {
   baseURL: '/api',
@@ -91,7 +95,6 @@ export const upvotePost = async (postId: number) => {
 }
 
 export const postSubmit = async (postForm: CreatePostSchema) => {
-  // throw new Error('Not implemented')
   const { data: response } = await axios.post<SuccessResponse<UpvoteData>>(
     `/posts`,
     postForm
@@ -100,9 +103,9 @@ export const postSubmit = async (postForm: CreatePostSchema) => {
   return postData
 }
 
-export const getPost = async (param: ParamIdSchema) => {
+export const getPost = async (postId: number) => {
   const { data: response } = await axios.get<SuccessResponse<Post>>(
-    `/posts/${param.id}`
+    `/posts/${postId}`
   )
   const { data: post } = response
   return post
@@ -111,7 +114,45 @@ export const getPost = async (param: ParamIdSchema) => {
 export const postQueryOptions = (postId: number) =>
   queryOptions({
     queryKey: ['post', postId],
-    queryFn: () => getPost({ id: postId }),
+    queryFn: () => getPost(postId),
     retry: false,
     throwOnError: true,
   })
+
+export const getComments = async (
+  postId: number,
+  params: CommentPaginationSchema
+) => {
+  const { data: response } = await axios.get<
+    PaginatedSuccessResponse<Comment[]>
+  >(`/posts/${postId}/comments`, { params })
+  const { data: posts, pagination } = response
+  return { posts, pagination }
+}
+
+export type GetComments = Awaited<ReturnType<typeof getComments>>
+
+export const commentsInfiniteQueryOptions = (
+  postId: number,
+  queryOptions: CommentSearchSchema
+) => {
+  const { sortedBy, order } = queryOptions
+  return infiniteQueryOptions({
+    queryKey: ['comments', postId, sortedBy, order],
+    queryFn: ({ pageParam }) =>
+      getComments(postId, {
+        page: Number(pageParam),
+        limit: 10,
+        sortedBy,
+        order,
+        includeChildren: true,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages, lastPageParam) => {
+      if (lastPage.pagination.totalPages <= lastPageParam) {
+        return undefined
+      }
+      return lastPageParam + 1
+    },
+  })
+}
