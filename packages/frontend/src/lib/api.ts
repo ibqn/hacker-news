@@ -126,8 +126,8 @@ export const getComments = async (
   const { data: response } = await axios.get<
     PaginatedSuccessResponse<Comment[]>
   >(`/posts/${postId}/comments`, { params })
-  const { data: posts, pagination } = response
-  return { posts, pagination }
+  const { data: comments, pagination } = response
+  return { comments, pagination }
 }
 
 export type GetComments = Awaited<ReturnType<typeof getComments>>
@@ -138,7 +138,7 @@ export const commentsInfiniteQueryOptions = (
 ) => {
   const { sortedBy, order } = queryOptions
   return infiniteQueryOptions({
-    queryKey: ['comments', postId, sortedBy, order],
+    queryKey: ['comments', 'post', postId, sortedBy, order],
     queryFn: ({ pageParam }) =>
       getComments(postId, {
         page: Number(pageParam),
