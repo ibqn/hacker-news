@@ -1,9 +1,13 @@
 import { CommentCard } from '@/components/comment-card'
 import { PostCard } from '@/components/post-card'
 import { SortBar } from '@/components/sort-bar'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useUpvotePost } from '@/hooks/use-upvote-post'
-import { commentsInfiniteQueryOptions, postQueryOptions } from '@/lib/api'
+import {
+  commentsForPostInfiniteQueryOptions,
+  postQueryOptions,
+} from '@/lib/api'
 import { commentSearchSchema } from '@/validators/comment-search'
 import {
   useSuspenseInfiniteQuery,
@@ -12,6 +16,7 @@ import {
 import { createFileRoute, notFound } from '@tanstack/react-router'
 import { zodSearchValidator } from '@tanstack/router-zod-adapter'
 import { paramIdSchema } from 'backend/src/validators/param'
+import { ChevronDownIcon } from 'lucide-react'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/post/$postId')({
@@ -39,7 +44,7 @@ function Post() {
     fetchNextPage,
     isFetchingNextPage,
   } = useSuspenseInfiniteQuery(
-    commentsInfiniteQueryOptions(Number(postId), { sortedBy, order })
+    commentsForPostInfiniteQueryOptions(Number(postId), { sortedBy, order })
   )
 
   const upvoteMutation = useUpvotePost()
@@ -67,7 +72,7 @@ function Post() {
       {comments && comments.pages[0].comments.length > 0 && (
         <Card className="border-border/25">
           <CardContent className="p-4">
-            {comments?.pages.map((page) =>
+            {comments.pages.map((page) =>
               page.comments.map((comment) => (
                 <CommentCard
                   key={comment.id}
@@ -76,6 +81,28 @@ function Post() {
                   setActiveReplyId={setActiveReplyId}
                 />
               ))
+            )}
+
+            {hasNextPage && (
+              <div className="mt-2">
+                <Button
+                  variant="ghost"
+                  className="flex h-auto items-center gap-0 space-x-1 p-0 text-xs text-muted-foreground hover:text-foreground"
+                  onClick={() => {
+                    fetchNextPage()
+                  }}
+                  disabled={!hasNextPage || isFetchingNextPage}
+                >
+                  {isFetchingNextPage ? (
+                    <span>Loading...</span>
+                  ) : (
+                    <>
+                      <ChevronDownIcon size={12} />
+                      <span>More replies</span>
+                    </>
+                  )}
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>

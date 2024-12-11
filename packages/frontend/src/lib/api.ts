@@ -119,7 +119,7 @@ export const postQueryOptions = (postId: number) =>
     throwOnError: true,
   })
 
-export const getComments = async (
+export const getCommentsForPost = async (
   postId: number,
   params: CommentPaginationSchema
 ) => {
@@ -130,9 +130,9 @@ export const getComments = async (
   return { comments, pagination }
 }
 
-export type GetComments = Awaited<ReturnType<typeof getComments>>
+export type GetCommentsForPost = Awaited<ReturnType<typeof getCommentsForPost>>
 
-export const commentsInfiniteQueryOptions = (
+export const commentsForPostInfiniteQueryOptions = (
   postId: number,
   queryOptions: CommentSearchSchema
 ) => {
@@ -140,7 +140,48 @@ export const commentsInfiniteQueryOptions = (
   return infiniteQueryOptions({
     queryKey: ['comments', 'post', postId, sortedBy, order],
     queryFn: ({ pageParam }) =>
-      getComments(postId, {
+      getCommentsForPost(postId, {
+        page: Number(pageParam),
+        limit: 10,
+        sortedBy,
+        order,
+        includeChildren: true,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages, lastPageParam) => {
+      if (lastPage.pagination.totalPages <= lastPageParam) {
+        return undefined
+      }
+      return lastPageParam + 1
+    },
+  })
+}
+
+export const getCommentsForComment = async (
+  commentId: number,
+  params: CommentPaginationSchema
+) => {
+  const { data: response } = await axios.get<
+    PaginatedSuccessResponse<Comment[]>
+  >(`/comments/${commentId}/comments`, { params })
+  const { data: comments, pagination } = response
+  return { comments, pagination }
+}
+
+export type GetCommentsForComment = Awaited<
+  ReturnType<typeof getCommentsForComment>
+>
+
+export const commentsForCommentInfiniteQueryOptions = (
+  commentId: number,
+  queryOptions: CommentSearchSchema
+) => {
+  const { sortedBy, order } = queryOptions
+
+  return infiniteQueryOptions({
+    queryKey: ['comments', 'comment', commentId, sortedBy, order],
+    queryFn: ({ pageParam }) =>
+      getCommentsForComment(commentId, {
         page: Number(pageParam),
         limit: 10,
         sortedBy,

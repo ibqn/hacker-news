@@ -1,8 +1,11 @@
 import { cn } from '@/lib/utils'
 import type { Comment } from 'backend/src/queries/comment'
 import { Button } from '@/components/ui/button'
-import { userQueryOptions } from '@/lib/api'
-import { useQuery } from '@tanstack/react-query'
+import {
+  commentsForCommentInfiniteQueryOptions,
+  userQueryOptions,
+} from '@/lib/api'
+import { useQuery, useSuspenseInfiniteQuery } from '@tanstack/react-query'
 import {
   ChevronUpIcon,
   MessageSquareIcon,
@@ -11,25 +14,63 @@ import {
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { Dispatch, SetStateAction, useState } from 'react'
+import { Separator } from '@/components/ui/separator'
 
 type Props = {
   comment: Comment
   activeReplyId: number | null
   setActiveReplyId: Dispatch<SetStateAction<number | null>>
+  isLast?: boolean
 }
 
 export function CommentCard({
   comment,
   activeReplyId,
   setActiveReplyId,
+  isLast = true,
 }: Props) {
   const { data: user } = useQuery(userQueryOptions())
 
   const [isCollapsed, setIsCollapsed] = useState(false)
 
-  const { id, content, depth, isUpvoted, points, author, createdAt } = comment
+  const {
+    id,
+    content,
+    depth,
+    isUpvoted,
+    points,
+    author,
+    createdAt,
+    childComments,
+    commentCount,
+  } = comment
 
   const isReplying = activeReplyId === id
+
+  const {
+    data: comments,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useSuspenseInfiniteQuery({
+    ...commentsForCommentInfiniteQueryOptions(id, {
+      sortedBy: 'recent',
+      order: 'desc',
+    }),
+    initialData: {
+      pages: [
+        {
+          comments: childComments ?? [],
+          pagination: {
+            page: 1,
+            totalPages: Math.ceil(commentCount / 10),
+          },
+        },
+      ],
+      pageParams: [1],
+    },
+  })
+
   return (
     <div className={cn(depth > 0 && 'ml-4 border-l border-border pl-4')}>
       <div className="py-2">
@@ -79,6 +120,22 @@ export function CommentCard({
           </>
         )}
       </div>
+      {/* <pre>{JSON.stringify(comments)}</pre> */}
+      {!isCollapsed &&
+        comments.pages.map((page, index) => {
+          const isLastPage = index === comments.pages.length - 1
+          return page.comments.map((comment, commentIndex) => (
+            <CommentCard
+              key={comment.id}
+              comment={comment}
+              activeReplyId={activeReplyId}
+              setActiveReplyId={setActiveReplyId}
+              isLast={isLastPage && commentIndex === page.comments.length - 1}
+            />
+          ))
+        })}
+
+      {!isLast && <Separator className="my-2" />}
     </div>
   )
 }
