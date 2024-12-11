@@ -73,8 +73,8 @@ const authRoute = new Hono<Context>()
     throw new HTTPException(401, { message: "You must be signed in to sign out" })
   })
   .get("/user", signedIn, async (c) => {
-    const { username } = c.get("user") as User
-    return c.json<SuccessResponse<UserData>>({ success: true, data: { username }, message: "User data" })
+    const user = c.get("user") as User
+    return c.json<SuccessResponse<UserData>>({ success: true, data: user, message: "User data" })
   })
 
 export { authRoute }
