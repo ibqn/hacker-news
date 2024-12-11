@@ -27,7 +27,11 @@ export async function validateSessionToken(token: string): Promise<SessionValida
 
   const sessionData = await db.query.session.findFirst({
     where: ({ id }, { eq }) => eq(id, sessionId),
-    with: { user: true },
+    with: {
+      user: {
+        columns: { id: true, username: true, createdAt: true },
+      },
+    },
   })
 
   if (!sessionData) {
