@@ -4,8 +4,7 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query'
-import { Post } from 'backend/src/queries/post'
-import { SuccessResponse } from 'backend/src/shared/types'
+import type { Post } from 'backend/src/queries/post'
 import { produce, nothing } from 'immer'
 import { toast } from 'sonner'
 
@@ -23,27 +22,29 @@ export const useUpvotePost = () => {
       await queryClient.cancelQueries({ queryKey: ['post', postId] })
       await queryClient.cancelQueries({ queryKey: ['posts'] })
 
-      const previousPostData = queryClient.getQueryData<SuccessResponse<Post>>([
-        'post',
-        postId,
-      ])
+      const previousPostData = queryClient.getQueryData<Post>(['post', postId])
 
-      queryClient.setQueryData<SuccessResponse<Post>>(
+      queryClient.setQueryData<Post>(
         ['post', postId],
         produce((draft) => {
           if (!draft) {
             return nothing
           }
-          optimisticPostUpvote(draft.data)
+
+          optimisticPostUpvote(draft)
         })
       )
 
-      const previousPostsData = queryClient.getQueryData<
+      const previousPostsData = queryClient.getQueriesData<
         InfiniteData<GetPosts>
-      >(['posts'])
+      >({ queryKey: ['posts'] })
 
-      queryClient.setQueryData<InfiniteData<GetPosts>>(
-        ['posts'],
+      console.log('previousPostsData', previousPostsData)
+
+      queryClient.setQueriesData<InfiniteData<GetPosts>>(
+        {
+          queryKey: ['posts'],
+        },
         produce((draft) => {
           if (!draft) {
             return nothing
@@ -61,7 +62,7 @@ export const useUpvotePost = () => {
 
       return { previousPostData, previousPostsData }
     },
-    onSettled: (_, postId) => {
+    onSettled: (_data, _error, postId) => {
       queryClient.invalidateQueries({ queryKey: ['posts'] })
       queryClient.invalidateQueries({ queryKey: ['post', postId] })
     },
@@ -71,7 +72,10 @@ export const useUpvotePost = () => {
       toast.error('Failed to upvote post')
 
       if (context?.previousPostsData) {
-        queryClient.setQueryData(['posts'], context.previousPostsData)
+        console.log('setting previous posts data', context.previousPostsData)
+        context.previousPostsData.forEach(([queryKey, data]) => {
+          queryClient.setQueriesData({ queryKey }, data)
+        })
       }
 
       if (context?.previousPostData) {
