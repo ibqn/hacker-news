@@ -24,7 +24,7 @@ app.get("/", (c) => {
 
 app.use("*", cors(), async (c, next) => {
   const token = getCookie(c, "session_token")
-  console.log("token", token)
+  // console.log("token", token)
   if (!token) {
     c.set("user", null)
     c.set("session", null)

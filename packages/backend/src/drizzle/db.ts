@@ -1,14 +1,9 @@
 import { drizzle } from "drizzle-orm/postgres-js"
 import { z } from "zod"
-import { userTable, sessionTable, sessionRelations, userRelations } from "@/drizzle/schema/auth"
-import { postRelations, postsTable } from "@/drizzle/schema/posts"
-import { commentRelations, commentsTable } from "@/drizzle/schema/comments"
-import {
-  commentUpvotesRelations,
-  commentUpvotesTable,
-  postUpvotesRelations,
-  postUpvotesTable,
-} from "@/drizzle/schema/upvotes"
+import { userTable, sessionTable, sessionRelations, userRelations } from "./schema/auth"
+import { postRelations, postsTable } from "./schema/posts"
+import { commentRelations, commentsTable } from "./schema/comments"
+import { commentUpvotesRelations, commentUpvotesTable, postUpvotesRelations, postUpvotesTable } from "./schema/upvotes"
 
 const envSchema = z.object({
   DATABASE_URL: z.string().url(),
