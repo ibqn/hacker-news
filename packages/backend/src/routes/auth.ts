@@ -7,7 +7,7 @@ import { db } from "@/drizzle/db"
 import { userTable, type User } from "@/drizzle/schema/auth"
 import { createSession, generateSessionToken, invalidateSessionToken } from "@/lucia"
 import { deleteCookie, getCookie, setCookie } from "hono/cookie"
-import type { SuccessResponse, UserData } from "@/shared/types"
+import type { SuccessResponse } from "@/shared/types"
 import postgres from "postgres"
 import { HTTPException } from "hono/http-exception"
 import { signedIn } from "@/middleware/signed-in"
@@ -74,7 +74,7 @@ const authRoute = new Hono<Context>()
   })
   .get("/user", signedIn, async (c) => {
     const user = c.get("user") as User
-    return c.json<SuccessResponse<UserData>>({ success: true, data: user, message: "User data" })
+    return c.json<SuccessResponse<User>>({ success: true, data: user, message: "User data" })
   })
 
 export { authRoute }

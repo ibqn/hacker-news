@@ -1,7 +1,7 @@
 import {
   type PaginatedSuccessResponse,
   type SuccessResponse,
-  type UserData,
+  type User,
 } from 'backend/src/shared/types'
 import { type Post } from 'backend/src/queries/post'
 import type { SigninSchema } from 'backend/src/validators/signin'
@@ -42,7 +42,7 @@ export const getSignout = async () => {
 
 export const getUser = async () => {
   const { data: response } =
-    await axios.get<SuccessResponse<UserData>>('/auth/user')
+    await axios.get<SuccessResponse<User>>('/auth/user')
   const { data: user } = response
   return user
 }
@@ -89,6 +89,14 @@ export const postsInfiniteQueryOptions = (queryOptions: PostSearchSchema) => {
 export const upvotePost = async (postId: number) => {
   const { data: response } = await axios.post<SuccessResponse<UpvoteData>>(
     `/posts/${postId}/upvote`
+  )
+  const { data: upvoteData } = response
+  return upvoteData
+}
+
+export const upvoteComment = async (commentId: number) => {
+  const { data: response } = await axios.post<SuccessResponse<UpvoteData>>(
+    `/comments/${commentId}/upvote`
   )
   const { data: upvoteData } = response
   return upvoteData

@@ -1,4 +1,4 @@
-import type { SigninSchema } from "../validators/signin"
+export type { User } from "../drizzle/schema/auth"
 
 export type SuccessResponse<T = void> = {
   success: true
@@ -10,8 +10,6 @@ export type ErrorResponse = {
   error: string
   isFormError?: boolean
 }
-
-export type UserData = Pick<SigninSchema, "username">
 
 export type PaginatedSuccessResponse<T> = SuccessResponse<T> & {
   pagination: {

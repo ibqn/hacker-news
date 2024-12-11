@@ -1,12 +1,12 @@
 import { userQueryOptions } from '@/lib/api'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
-import { UserData } from 'backend/src/shared/types'
+import { User } from 'backend/src/shared/types'
 
 export const Route = createFileRoute('/_protected')({
   component: ProtectedLayout,
   beforeLoad: async ({ context, location }) => {
     const user =
-      await context.queryClient.ensureQueryData<UserData>(userQueryOptions())
+      await context.queryClient.ensureQueryData<User>(userQueryOptions())
     if (!user) {
       throw redirect({ to: '/signin', search: { redirect: location.href } })
     }
