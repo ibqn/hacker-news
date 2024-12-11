@@ -7,6 +7,7 @@ import {
 } from '@/lib/api'
 import { useQuery, useSuspenseInfiniteQuery } from '@tanstack/react-query'
 import {
+  ChevronDownIcon,
   ChevronUpIcon,
   MessageSquareIcon,
   MinusIcon,
@@ -15,19 +16,20 @@ import {
 import { formatDistanceToNow } from 'date-fns'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { Separator } from '@/components/ui/separator'
+import { queryClient } from '@/query-client'
 
 type Props = {
   comment: Comment
   activeReplyId: number | null
   setActiveReplyId: Dispatch<SetStateAction<number | null>>
-  isLast?: boolean
+  isLast: boolean
 }
 
 export function CommentCard({
   comment,
   activeReplyId,
   setActiveReplyId,
-  isLast = true,
+  isLast,
 }: Props) {
   const { data: user } = useQuery(userQueryOptions())
 
@@ -70,6 +72,8 @@ export function CommentCard({
       pageParams: [1],
     },
   })
+  const loadFirstPage =
+    comments.pages[0].comments.length === 0 && commentCount > 0
 
   return (
     <div className={cn(depth > 0 && 'ml-4 border-l border-border pl-4')}>
@@ -134,6 +138,34 @@ export function CommentCard({
             />
           ))
         })}
+
+      {!isCollapsed && (loadFirstPage || hasNextPage) && (
+        <div className="mt-2">
+          <Button
+            variant="ghost"
+            className="flex h-auto items-center gap-0 space-x-1 p-0 text-xs text-muted-foreground hover:text-foreground"
+            onClick={() => {
+              if (loadFirstPage) {
+                queryClient.invalidateQueries({
+                  queryKey: ['comments', 'comment', id],
+                })
+              } else {
+                fetchNextPage()
+              }
+            }}
+            disabled={!(hasNextPage || loadFirstPage) || isFetchingNextPage}
+          >
+            {isFetchingNextPage ? (
+              <span>"Loading..."</span>
+            ) : (
+              <>
+                <ChevronDownIcon size={12} />
+                <span>More replies</span>
+              </>
+            )}
+          </Button>
+        </div>
+      )}
 
       {!isLast && <Separator className="my-2" />}
     </div>

@@ -73,12 +73,13 @@ function Post() {
         <Card className="border-border/25">
           <CardContent className="p-4">
             {comments.pages.map((page) =>
-              page.comments.map((comment) => (
+              page.comments.map((comment, index) => (
                 <CommentCard
                   key={comment.id}
                   comment={comment}
                   activeReplyId={activeReplyId}
                   setActiveReplyId={setActiveReplyId}
+                  isLast={index === page.comments.length - 1}
                 />
               ))
             )}
