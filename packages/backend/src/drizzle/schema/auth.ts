@@ -37,5 +37,5 @@ export const sessionRelations = relations(sessionTable, ({ one }) => ({
   user: one(userTable, { fields: [sessionTable.userId], references: [userTable.id] }),
 }))
 
-export type User = InferSelectModel<typeof userTable>
+export type User = Omit<InferSelectModel<typeof userTable>, "passwordHash">
 export type Session = InferSelectModel<typeof sessionTable>
