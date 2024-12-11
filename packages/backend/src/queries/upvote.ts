@@ -21,7 +21,7 @@ export const createCommentUpvote = async ({ id, user }: CreateUpvoteOptions) => 
     const [existingUpvote] = await trx
       .select()
       .from(commentUpvotesTable)
-      .where(and(eq(commentUpvotesTable.id, id), eq(commentUpvotesTable.userId, user.id)))
+      .where(and(eq(commentUpvotesTable.commentId, id), eq(commentUpvotesTable.userId, user.id)))
       .limit(1)
 
     const pointChange = existingUpvote ? -1 : 1
