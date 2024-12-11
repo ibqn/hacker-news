@@ -30,11 +30,11 @@ export const useUpvotePost = () => {
 
       queryClient.setQueryData<SuccessResponse<Post>>(
         ['post', postId],
-        produce((draft?: Post) => {
+        produce((draft) => {
           if (!draft) {
             return nothing
           }
-          optimisticPostUpvote(draft)
+          optimisticPostUpvote(draft.data)
         })
       )
 
