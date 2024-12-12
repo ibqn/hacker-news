@@ -1,4 +1,4 @@
-import { userQueryOptions } from '@/lib/api'
+import { userQueryOptions } from '@/api/auth'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { User } from 'backend/src/shared/types'
 

@@ -1,6 +1,6 @@
 import { Header } from '@/components/header'
 import { Toaster } from '@/components/ui/sonner'
-import { userQueryOptions } from '@/lib/api'
+import { userQueryOptions } from '@/api/auth'
 import { queryClient } from '@/query-client'
 import { QueryClient, useQuery } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'

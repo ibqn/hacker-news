@@ -4,10 +4,7 @@ import { SortBar } from '@/components/sort-bar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useUpvotePost } from '@/hooks/use-upvote-post'
-import {
-  commentsForPostInfiniteQueryOptions,
-  postQueryOptions,
-} from '@/lib/api'
+import { postQueryOptions } from '@/api/post'
 import { commentSearchSchema } from '@/validators/comment-search'
 import {
   useSuspenseInfiniteQuery,
@@ -18,6 +15,7 @@ import { zodSearchValidator } from '@tanstack/router-zod-adapter'
 import { paramIdSchema } from 'backend/src/validators/param'
 import { ChevronDownIcon } from 'lucide-react'
 import { useState } from 'react'
+import { commentsForPostInfiniteQueryOptions } from '@/api/comment'
 
 export const Route = createFileRoute('/post/$postId')({
   component: Post,

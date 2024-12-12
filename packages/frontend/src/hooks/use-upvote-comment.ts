@@ -1,8 +1,8 @@
+import { upvoteComment } from '@/api/upvote'
 import {
   type GetCommentsForComment,
   type GetCommentsForPost,
-  upvoteComment,
-} from '@/lib/api'
+} from '@/api/comment'
 import {
   InfiniteData,
   useMutation,
@@ -59,7 +59,7 @@ export const useUpvoteComment = () => {
           }
 
           draft.pages.forEach((page) =>
-            page.comments.forEach((comment: Comment) => {
+            page.comments.forEach((comment) => {
               if (comment.id === commentId) {
                 optimisticCommentUpvote(comment, userId)
               }

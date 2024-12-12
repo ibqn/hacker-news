@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { postSubmit } from '@/lib/api'
+import { postSubmit } from '@/api/post'
 import { queryClient } from '@/query-client'
 import { useForm } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
@@ -20,6 +20,7 @@ import { createPostSchema } from 'backend/src/validators/post'
 import { toast } from 'sonner'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
+import type { Post } from 'backend/src/queries/post'
 
 export const Route = createFileRoute('/_protected/submit')({
   component: Submit,
@@ -29,10 +30,12 @@ function Submit() {
   const navigate = useNavigate()
   const { mutate: submitPost } = useMutation({
     mutationFn: postSubmit,
-    onSettled: async () => {
+    onSettled: async (post?: Post) => {
       await queryClient.invalidateQueries({ queryKey: ['posts'] })
 
-      await navigate({ to: `post/id` })
+      if (post) {
+        await navigate({ to: `/post/${post.id}` })
+      }
     },
     onError: (error) => {
       let message = 'Signin failed'

@@ -1,10 +1,7 @@
 import { cn } from '@/lib/utils'
 import type { Comment } from 'backend/src/queries/comment'
 import { Button } from '@/components/ui/button'
-import {
-  commentsForCommentInfiniteQueryOptions,
-  userQueryOptions,
-} from '@/lib/api'
+import { commentsForCommentInfiniteQueryOptions } from '@/api/comment'
 import { useQuery, useSuspenseInfiniteQuery } from '@tanstack/react-query'
 import {
   ChevronDownIcon,
@@ -18,6 +15,7 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import { Separator } from '@/components/ui/separator'
 import { queryClient } from '@/query-client'
 import { useUpvoteComment } from '@/hooks/use-upvote-comment'
+import { userQueryOptions } from '@/api/auth'
 
 type Props = {
   comment: Comment

@@ -1,4 +1,5 @@
-import { type GetPosts, upvotePost } from '@/lib/api'
+import { upvotePost } from '@/api/upvote'
+import { type GetPosts } from '@/api/post'
 import {
   InfiniteData,
   useMutation,

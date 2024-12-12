@@ -1,4 +1,4 @@
-import { getSignout, userQueryOptions } from '@/lib/api'
+import { getSignout, userQueryOptions } from '@/api/auth'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { ComponentProps } from 'react'
