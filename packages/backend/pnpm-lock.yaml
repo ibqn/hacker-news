@@ -24,11 +24,11 @@ importers:
         specifier: ^0.41.1
         version: 0.41.1
       drizzle-orm:
-        specifier: ^0.38.0
-        version: 0.38.0(@types/pg@8.11.10)(pg@8.13.1)(postgres@3.4.5)
+        specifier: ^0.38.1
+        version: 0.38.1(@types/pg@8.11.10)(pg@8.13.1)(postgres@3.4.5)
       drizzle-zod:
         specifier: ^0.6.0
-        version: 0.6.0(drizzle-orm@0.38.0(@types/pg@8.11.10)(pg@8.13.1)(postgres@3.4.5))(zod@3.24.1)
+        version: 0.6.0(drizzle-orm@0.38.1(@types/pg@8.11.10)(pg@8.13.1)(postgres@3.4.5))(zod@3.24.1)
       hono:
         specifier: ^4.6.13
         version: 4.6.13
@@ -40,8 +40,8 @@ importers:
         version: 3.24.1
     devDependencies:
       '@types/node':
-        specifier: ^22.10.1
-        version: 22.10.1
+        specifier: ^22.10.2
+        version: 22.10.2
       drizzle-kit:
         specifier: ^0.30.0
         version: 0.30.0
@@ -507,8 +507,8 @@ packages:
     resolution: {integrity: sha512-m7X9U6BG2+J+R1lSOdCiITLLrxm+cWlNI3HUFA92oLO77ObGNzaKdh8pMLqdZcshtkKuV84olNNXDfMc4FezBQ==}
     engines: {node: '>=10'}
 
-  '@types/node@22.10.1':
-    resolution: {integrity: sha512-qKgsUwfHZV2WCWLAnVP1JqnpE6Im6h3Y0+fYgMTasNQ7V++CBX5OT1as0g0f+OyubbFqhf6XVNIsmN4IIhEgGQ==}
+  '@types/node@22.10.2':
+    resolution: {integrity: sha512-Xxr6BBRCAOQixvonOye19wnzyDiUtTeqldOOmj3CkeblonbccA12PFwlufvRdrpjXxqnmUaeiU5EOA+7s5diUQ==}
 
   '@types/pg@8.11.10':
     resolution: {integrity: sha512-LczQUW4dbOQzsH2RQ5qoeJ6qJPdrcM/DcMLoqWQkMLMsq83J5lAX3LXjdkWdpscFy67JSOWDnh7Ny/sPFykmkg==}
@@ -533,8 +533,8 @@ packages:
     resolution: {integrity: sha512-zAf0qg/BX2lV/Xip4igXrtbDv+Ub8S39U6qSOEGNvqcHrnmaQjS4mkkFZOUsgXRbuH56QUeWZxfnLHefrKCV5g==}
     hasBin: true
 
-  drizzle-orm@0.38.0:
-    resolution: {integrity: sha512-Ev1UYKOUxiVwLZZfos4hoNDMDkp313FqF0CHelhR+BeOdb76z/a6pKF6SgYQSrmj6EXH4cy6QIkmuxl2KIFW0A==}
+  drizzle-orm@0.38.1:
+    resolution: {integrity: sha512-TpOzNrPGy7dl0/uP9vKD6ATzp9noJaRYhOYqtOCKxxwSmZqrPxN4SW5kWawVUIcbSd2lkbDCdZue+gtVNLmQsg==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=4'
@@ -1037,13 +1037,13 @@ snapshots:
 
   '@phc/format@1.0.0': {}
 
-  '@types/node@22.10.1':
+  '@types/node@22.10.2':
     dependencies:
       undici-types: 6.20.0
 
   '@types/pg@8.11.10':
     dependencies:
-      '@types/node': 22.10.1
+      '@types/node': 22.10.2
       pg-protocol: 1.7.0
       pg-types: 4.0.2
     optional: true
@@ -1069,15 +1069,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.38.0(@types/pg@8.11.10)(pg@8.13.1)(postgres@3.4.5):
+  drizzle-orm@0.38.1(@types/pg@8.11.10)(pg@8.13.1)(postgres@3.4.5):
     optionalDependencies:
       '@types/pg': 8.11.10
       pg: 8.13.1
       postgres: 3.4.5
 
-  drizzle-zod@0.6.0(drizzle-orm@0.38.0(@types/pg@8.11.10)(pg@8.13.1)(postgres@3.4.5))(zod@3.24.1):
+  drizzle-zod@0.6.0(drizzle-orm@0.38.1(@types/pg@8.11.10)(pg@8.13.1)(postgres@3.4.5))(zod@3.24.1):
     dependencies:
-      drizzle-orm: 0.38.0(@types/pg@8.11.10)(pg@8.13.1)(postgres@3.4.5)
+      drizzle-orm: 0.38.1(@types/pg@8.11.10)(pg@8.13.1)(postgres@3.4.5)
       zod: 3.24.1
 
   esbuild-register@3.6.0(esbuild@0.19.12):
