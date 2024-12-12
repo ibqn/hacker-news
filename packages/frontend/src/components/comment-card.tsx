@@ -17,6 +17,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { Separator } from '@/components/ui/separator'
 import { queryClient } from '@/query-client'
+import { useUpvoteComment } from '@/hooks/use-upvote-comment'
 
 type Props = {
   comment: Comment
@@ -39,13 +40,17 @@ export function CommentCard({
     id,
     content,
     depth,
-    isUpvoted,
     points,
     author,
     createdAt,
     childComments,
     commentCount,
+    commentUpvotes,
+    parentCommentId,
+    postId,
   } = comment
+
+  const isUpvoted = commentUpvotes?.length > 0
 
   const isReplying = activeReplyId === id
 
@@ -62,7 +67,11 @@ export function CommentCard({
     initialData: {
       pages: [
         {
-          comments: childComments ?? [],
+          comments:
+            childComments?.map((comment) => ({
+              ...comment,
+              childComments: [],
+            })) ?? [],
           pagination: {
             page: 1,
             totalPages: Math.ceil(commentCount / 10),
@@ -72,8 +81,11 @@ export function CommentCard({
       pageParams: [1],
     },
   })
+
   const loadFirstPage =
     comments.pages[0].comments.length === 0 && commentCount > 0
+
+  const upvoteMutation = useUpvoteComment()
 
   return (
     <div className={cn(depth > 0 && 'ml-4 border-l border-border pl-4')}>
@@ -86,6 +98,14 @@ export function CommentCard({
               'flex h-auto items-center gap-0 space-x-1 p-0 text-xs hover:text-primary',
               isUpvoted ? 'text-primary' : 'text-muted-foreground'
             )}
+            onClick={() => {
+              upvoteMutation.mutate({
+                commentId: id,
+                postId,
+                userId: user?.id ?? '',
+                parentCommentId,
+              })
+            }}
           >
             <ChevronUpIcon size={14} />
             <span className="font-medium">{points}</span>
