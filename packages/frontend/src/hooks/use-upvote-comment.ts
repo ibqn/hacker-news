@@ -25,6 +25,8 @@ function optimisticCommentUpvote(comment: Comment, userId: string) {
   comment.commentUpvotes = isUpvoted ? [] : [{ userId }]
 }
 
+type QueriesComments = InfiniteData<GetCommentsForPost | GetCommentsForComment>
+
 export const useUpvoteComment = () => {
   const queryClient = useQueryClient()
 
@@ -43,16 +45,12 @@ export const useUpvoteComment = () => {
 
       await queryClient.cancelQueries({ queryKey })
 
-      const previousCommentsData = queryClient.getQueriesData<
-        InfiniteData<GetCommentsForPost | GetCommentsForComment>
-      >({ queryKey })
+      const previousCommentsData = queryClient.getQueriesData<QueriesComments>({
+        queryKey,
+      })
 
-      queryClient.setQueriesData<
-        InfiniteData<GetCommentsForPost | GetCommentsForPost>
-      >(
-        {
-          queryKey,
-        },
+      queryClient.setQueriesData<QueriesComments>(
+        { queryKey },
         produce((draft) => {
           if (!draft) {
             return nothing
@@ -83,7 +81,7 @@ export const useUpvoteComment = () => {
 
       if (context?.previousCommentsData) {
         context.previousCommentsData.forEach(([queryKey, data]) =>
-          queryClient.setQueriesData({ queryKey }, data)
+          queryClient.setQueriesData<QueriesComments>({ queryKey }, data)
         )
       }
     },
