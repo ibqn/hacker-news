@@ -16,6 +16,7 @@ import { Separator } from '@/components/ui/separator'
 import { queryClient } from '@/query-client'
 import { useUpvoteComment } from '@/hooks/use-upvote-comment'
 import { userQueryOptions } from '@/api/auth'
+import { CommentForm } from '@/components/comment-form'
 
 type Props = {
   comment: Comment
@@ -85,8 +86,15 @@ export function CommentCard({
 
   const upvoteMutation = useUpvoteComment()
 
+  const isDraft = id === -1
+
   return (
-    <div className={cn(depth > 0 && 'ml-4 border-l border-border pl-4')}>
+    <div
+      className={cn(
+        depth > 0 && 'ml-4 border-l border-border pl-4',
+        isDraft && 'pointer-events-none opacity-50'
+      )}
+    >
       <div className="py-2">
         <div className="mb-2 flex items-center space-x-1 text-xs">
           <Button
@@ -138,7 +146,14 @@ export function CommentCard({
               </Button>
             )}
 
-            {isReplying && <div className="mt-2">CommentForm</div>}
+            {isReplying && (
+              <div className="mt-2">
+                <CommentForm
+                  commentId={id}
+                  onSubmitted={() => setActiveReplyId(null)}
+                />
+              </div>
+            )}
           </>
         )}
       </div>

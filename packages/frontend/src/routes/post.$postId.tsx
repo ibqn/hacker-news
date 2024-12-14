@@ -16,6 +16,8 @@ import { paramIdSchema } from 'backend/src/validators/param'
 import { ChevronDownIcon } from 'lucide-react'
 import { useState } from 'react'
 import { commentsForPostInfiniteQueryOptions } from '@/api/comment'
+import { CommentForm } from '@/components/comment-form'
+import { userQueryOptions } from '@/api/auth'
 
 export const Route = createFileRoute('/post/$postId')({
   component: Post,
@@ -35,6 +37,7 @@ function Post() {
   const [activeReplyId, setActiveReplyId] = useState<number | null>(null)
 
   const { data: post } = useSuspenseQuery(postQueryOptions(Number(postId)))
+  const { data: user } = useSuspenseQuery(userQueryOptions())
 
   const {
     data: comments,
@@ -61,6 +64,14 @@ function Post() {
         <h2 className="mb-2 text-base font-semibold text-foreground">
           Comments
         </h2>
+
+        {user && (
+          <Card className="mb-4 border-border/25">
+            <CardContent className="p-4">
+              <CommentForm postId={post.id} />
+            </CardContent>
+          </Card>
+        )}
 
         {comments && comments.pages[0].comments.length > 0 && (
           <SortBar sortedBy={sortedBy} order={order} />
