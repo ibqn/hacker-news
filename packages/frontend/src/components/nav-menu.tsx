@@ -1,9 +1,13 @@
 import { getSignout, userQueryOptions } from '@/api/auth'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { ComponentProps } from 'react'
+import type { ComponentProps } from 'react'
 import { Button } from '@/components/ui/button'
 import { queryClient } from '@/query-client'
+import type {
+  OrderSchema,
+  SortedBySchema,
+} from 'backend/src/validators/pagination'
 
 export type Props = {
   navProps?: ComponentProps<'nav'>
@@ -13,11 +17,15 @@ export type Props = {
 type NavLinks = {
   name: string
   href: ComponentProps<typeof Link>['to']
+  search?: {
+    sortedBy?: SortedBySchema
+    oder?: OrderSchema
+  }
 }
 
 const links: NavLinks[] = [
-  { name: 'new', href: '/about' },
-  { name: 'top', href: '/about' },
+  { name: 'new', href: '/', search: { sortedBy: 'recent' } },
+  { name: 'top', href: '/', search: { sortedBy: 'points' } },
   { name: 'submit', href: '/submit' },
 ]
 
@@ -36,7 +44,11 @@ export const NavMenu = ({ navProps = {}, ulProps = {} }: Props) => {
       <ul {...ulProps}>
         {links.map((link, index) => (
           <li key={index}>
-            <Link to={link.href} className="hover:underline">
+            <Link
+              to={link.href}
+              search={link.search}
+              className="hover:underline"
+            >
               {link.name}
             </Link>
           </li>
