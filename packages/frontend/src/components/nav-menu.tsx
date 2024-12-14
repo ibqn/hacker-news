@@ -1,7 +1,7 @@
 import { getSignout, userQueryOptions } from '@/api/auth'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import type { ComponentProps } from 'react'
+import { type ComponentProps } from 'react'
 import { Button } from '@/components/ui/button'
 import { queryClient } from '@/query-client'
 import type {
@@ -12,6 +12,7 @@ import type {
 export type Props = {
   navProps?: ComponentProps<'nav'>
   ulProps?: ComponentProps<'ul'>
+  setOpen?: (open: boolean) => void
 }
 
 type NavLinks = {
@@ -29,12 +30,13 @@ const links: NavLinks[] = [
   { name: 'submit', href: '/submit' },
 ]
 
-export const NavMenu = ({ navProps = {}, ulProps = {} }: Props) => {
+export const NavMenu = ({ navProps = {}, ulProps = {}, setOpen }: Props) => {
   const { data: user } = useQuery(userQueryOptions())
 
   const { mutate: signout } = useMutation({
     mutationFn: getSignout,
     onSettled: async () => {
+      setOpen?.(false)
       queryClient.setQueryData(['user'], null)
     },
   })
@@ -48,6 +50,7 @@ export const NavMenu = ({ navProps = {}, ulProps = {} }: Props) => {
               to={link.href}
               search={link.search}
               className="hover:underline"
+              onClick={() => setOpen?.(false)}
             >
               {link.name}
             </Link>
@@ -74,7 +77,9 @@ export const NavMenu = ({ navProps = {}, ulProps = {} }: Props) => {
           variant="secondary"
           className="bg-secondary-foreground text-primary-foreground hover:bg-secondary-foreground/70"
         >
-          <Link to="/signin">Sign in</Link>
+          <Link to="/signin" onClick={() => setOpen?.(false)}>
+            Sign in
+          </Link>
         </Button>
       )}
     </nav>

@@ -10,8 +10,10 @@ import {
 import { Button } from '@/components/ui/button'
 import { MenuIcon } from 'lucide-react'
 import { NavMenu } from '@/components/nav-menu'
+import { useState } from 'react'
 
 export const Header = () => {
+  const [open, setOpen] = useState(false)
   return (
     <header className="sticky top-0 z-50 w-full border-border/40 bg-primary/95 backdrop-blur supports-[backdrop-filter]:bg-primary/90">
       <div className="container mx-auto flex items-center justify-between p-4 text-primary-foreground">
@@ -29,7 +31,7 @@ export const Header = () => {
           />
         </div>
 
-        <Sheet>
+        <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button
               variant="secondary"
@@ -52,6 +54,7 @@ export const Header = () => {
               ulProps={{
                 className: 'flex flex-col space-y-2',
               }}
+              setOpen={setOpen}
             />
           </SheetContent>
         </Sheet>
