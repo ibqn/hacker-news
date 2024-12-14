@@ -6,6 +6,8 @@ import { ChevronUpIcon } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { badgeVariants } from '@/components/ui/badge'
 import { formatDistanceToNow } from 'date-fns'
+import { userQueryOptions } from '@/api/auth'
+import { useQuery } from '@tanstack/react-query'
 
 type Props = {
   post: Post
@@ -13,6 +15,8 @@ type Props = {
 }
 
 export function PostCard({ post, onUpvote }: Props) {
+  const { data: user } = useQuery(userQueryOptions())
+
   const {
     id,
     isUpvoted,
@@ -38,6 +42,7 @@ export function PostCard({ post, onUpvote }: Props) {
           'ml-3 flex h-auto flex-col items-center justify-center text-muted-foreground hover:text-primary',
           isUpvoted && 'text-primary'
         )}
+        disabled={!user}
       >
         <ChevronUpIcon size={20} />
         <span className="text-xs font-medium">{points}</span>
