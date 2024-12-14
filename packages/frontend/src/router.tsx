@@ -9,6 +9,7 @@ import { ErrorView } from '@/components/error-view'
 // Create a new router instance
 export const router = createRouter({
   routeTree,
+  defaultPreload: 'intent',
   context: { queryClient },
   defaultPendingComponent: Loading,
   defaultNotFoundComponent: NotFound,

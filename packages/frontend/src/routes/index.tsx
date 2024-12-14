@@ -11,6 +11,13 @@ import { zodSearchValidator } from '@tanstack/router-zod-adapter'
 export const Route = createFileRoute('/')({
   component: Index,
   validateSearch: zodSearchValidator(postSearchSchema),
+  loaderDeps: ({ search }) => search,
+  loader: async ({ context, deps: search }) => {
+    console.log('search deps', search)
+    await context.queryClient.ensureInfiniteQueryData(
+      postsInfiniteQueryOptions(search)
+    )
+  },
 })
 
 function Index() {

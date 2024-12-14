@@ -22,11 +22,18 @@ import { userQueryOptions } from '@/api/auth'
 export const Route = createFileRoute('/post/$postId')({
   component: Post,
   validateSearch: zodSearchValidator(commentSearchSchema),
-  loader: async ({ params: { postId } }) => {
+  loaderDeps: ({ search }) => search,
+  loader: async ({ context, params: { postId }, deps: search }) => {
+    console.log('deps', search)
     const result = paramIdSchema.safeParse({ id: postId })
     if (!result.success) {
       throw notFound()
     }
+
+    await context.queryClient.ensureQueryData(postQueryOptions(Number(postId)))
+    await context.queryClient.ensureInfiniteQueryData(
+      commentsForPostInfiniteQueryOptions(Number(postId), search)
+    )
   },
 })
 
