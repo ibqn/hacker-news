@@ -13,7 +13,6 @@ import { queryClient } from '@/query-client'
 import { useForm } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { zodValidator } from '@tanstack/zod-form-adapter'
 import { AxiosError } from 'axios'
 import { ErrorResponse } from 'backend/src/shared/types'
 import { createPostSchema } from 'backend/src/validators/post'
@@ -58,7 +57,6 @@ function Submit() {
       content: '',
       url: '',
     },
-    validatorAdapter: zodValidator(),
     validators: {
       onChange: createPostSchema,
     },

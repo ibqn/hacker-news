@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { zodSearchValidator } from '@tanstack/router-zod-adapter'
 import { useForm } from '@tanstack/react-form'
-import { zodValidator } from '@tanstack/zod-form-adapter'
 import { signinSchema } from 'backend/src/validators/signin'
 import {
   Card,
@@ -43,7 +42,6 @@ function Signin() {
       username: '',
       password: '',
     },
-    validatorAdapter: zodValidator(),
     validators: {
       onChange: signinSchema,
     },

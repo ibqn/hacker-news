@@ -1,5 +1,4 @@
 import { useForm } from '@tanstack/react-form'
-import { zodValidator } from '@tanstack/zod-form-adapter'
 import { createCommentSchema } from 'backend/src/validators/comment'
 import { Button } from '@/components/ui/button'
 import { FieldInfo } from '@/components/field-info'
@@ -25,7 +24,6 @@ export function CommentForm({ postId, commentId, onSubmitted }: Props) {
     defaultValues: {
       content: '',
     },
-    validatorAdapter: zodValidator(),
     validators: { onChange: createCommentSchema },
     onSubmit: async ({ value }) => {
       console.log('Submit', value)
