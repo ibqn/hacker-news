@@ -11,6 +11,8 @@ export type ErrorResponse = {
   isFormError?: boolean
 }
 
+export type ApiResponse<T = void> = SuccessResponse<T> | ErrorResponse
+
 export type PaginatedSuccessResponse<T> = SuccessResponse<T> & {
   pagination: {
     page: number
