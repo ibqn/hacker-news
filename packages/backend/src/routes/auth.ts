@@ -11,6 +11,7 @@ import type { SuccessResponse } from "@/shared/types"
 import postgres from "postgres"
 import { HTTPException } from "hono/http-exception"
 import { signedIn } from "@/middleware/signed-in"
+import { getSessionCookieOptions, sessionCookieName } from "@/cookie"
 
 const authRoute = new Hono<Context>()
   .post("/signup", zValidator("form", signinSchema), async (c) => {
@@ -30,7 +31,7 @@ const authRoute = new Hono<Context>()
       const token = generateSessionToken()
       const session = await createSession(token, user.id)
 
-      setCookie(c, "session_token", token)
+      setCookie(c, sessionCookieName, token, getSessionCookieOptions())
       return c.json<SuccessResponse>({ success: true, message: "User created" }, 201)
     } catch (error) {
       if (error instanceof postgres.PostgresError && error.code === "23505") {
@@ -60,14 +61,14 @@ const authRoute = new Hono<Context>()
     const token = generateSessionToken()
     const session = await createSession(token, user.id)
 
-    setCookie(c, "session_token", token)
+    setCookie(c, sessionCookieName, token, getSessionCookieOptions())
     return c.json<SuccessResponse>({ success: true, message: "Signed in" }, 201)
   })
   .get("/signout", signedIn, async (c) => {
-    const token = getCookie(c, "session_token")
+    const token = getCookie(c, sessionCookieName)
     if (token) {
       await invalidateSessionToken(token)
-      deleteCookie(c, "session_token")
+      deleteCookie(c, sessionCookieName)
       return c.json<SuccessResponse>({ success: true, message: "Signed out" })
     }
     throw new HTTPException(401, { message: "You must be signed in to sign out" })

@@ -11,6 +11,7 @@ import { cors } from "hono/cors"
 import { prettyJSON } from "hono/pretty-json"
 import { postRoute } from "@/routes/posts"
 import { commentRoute } from "@/routes/comments"
+import { getSessionCookieOptions, sessionCookieName } from "./cookie"
 
 const app = new Hono<Context>()
 
@@ -23,7 +24,7 @@ app.get("/", (c) => {
 })
 
 app.use("*", cors(), async (c, next) => {
-  const token = getCookie(c, "session_token")
+  const token = getCookie(c, sessionCookieName)
   // console.log("token", token)
   if (!token) {
     c.set("user", null)
@@ -33,11 +34,10 @@ app.use("*", cors(), async (c, next) => {
 
   const { session, user } = await validateSessionToken(token)
   if (session) {
-    setCookie(c, "session_token", token)
+    setCookie(c, sessionCookieName, token, getSessionCookieOptions())
+  } else {
+    deleteCookie(c, sessionCookieName)
   }
-  // else {
-  //   deleteCookie(c, "session_token")
-  // }
   c.set("session", session)
   c.set("user", user)
 
@@ -73,7 +73,4 @@ app.onError((error, c) => {
 const port = 3333
 console.log(`Server is running on http://localhost:${port}`)
 
-serve({
-  fetch: app.fetch,
-  port,
-})
+serve({ fetch: app.fetch, port })
