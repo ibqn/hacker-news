@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { FieldInfo } from '@/components/field-info'
 import { Button } from '@/components/ui/button'
 import { useMutation } from '@tanstack/react-query'
-import { postSignin } from '@/api/auth'
+import { postSignin, userQueryOptions } from '@/api/auth'
 import { queryClient } from '@/query-client'
 import { toast } from 'sonner'
 import { ErrorResponse } from 'backend/src/shared/types'
@@ -55,7 +55,7 @@ function Signin() {
     onSuccess: async () => {
       console.log('Signin success')
       await queryClient.invalidateQueries({
-        queryKey: ['user'],
+        queryKey: userQueryOptions().queryKey,
       })
 
       await navigate({ to: search.redirect })

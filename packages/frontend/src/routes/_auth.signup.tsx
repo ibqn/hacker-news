@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { FieldInfo } from '@/components/field-info'
 import { Button } from '@/components/ui/button'
-import { postSignup } from '@/api/auth'
+import { postSignup, userQueryOptions } from '@/api/auth'
 import { toast } from 'sonner'
 import { useMutation } from '@tanstack/react-query'
 import { queryClient } from '@/query-client'
@@ -70,7 +70,7 @@ function Signup() {
     onSuccess: async () => {
       console.log('Signin success')
       await queryClient.invalidateQueries({
-        queryKey: ['user'],
+        queryKey: userQueryOptions().queryKey,
       })
 
       await navigate({ to: search.redirect })

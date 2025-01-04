@@ -1,3 +1,4 @@
+import { userQueryOptions } from '@/api/auth'
 import {
   postComment,
   type GetCommentsForComment,
@@ -32,7 +33,7 @@ export const useCreateComment = () => {
         queryKey,
       })
 
-      const user = queryClient.getQueryData<User>(['user'])
+      const user = queryClient.getQueryData<User>(userQueryOptions().queryKey)
 
       queryClient.setQueriesData<QueriesComments>(
         { queryKey },

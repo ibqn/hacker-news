@@ -22,7 +22,7 @@ function Root() {
 
   useEffect(() => {
     if (error) {
-      queryClient.setQueryData(['user'], null)
+      queryClient.setQueryData(userQueryOptions().queryKey, null)
     }
   }, [error])
 

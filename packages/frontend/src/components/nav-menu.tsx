@@ -37,7 +37,7 @@ export const NavMenu = ({ navProps = {}, ulProps = {}, setOpen }: Props) => {
     mutationFn: getSignout,
     onSettled: async () => {
       setOpen?.(false)
-      queryClient.setQueryData(['user'], null)
+      queryClient.setQueryData(userQueryOptions().queryKey, null)
     },
   })
 
