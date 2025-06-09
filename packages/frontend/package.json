@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
-    "@tailwindcss/postcss": "^4.1.8",
+    "@tailwindcss/vite": "^4.1.8",
     "@tanstack/router-devtools": "^1.120.20",
     "@tanstack/router-plugin": "^1.120.20",
     "@types/node": "^22.15.30",
@@ -50,7 +50,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.2.0",
-    "postcss": "^8.5.4",
+    "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.12",
     "tailwindcss": "^4.1.8",
     "typescript": "~5.8.3",
