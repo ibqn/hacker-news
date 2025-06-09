@@ -9,11 +9,7 @@ export const postUpvotesTable = schema.table("post_upvotes", {
   id: serial("id").primaryKey(),
   userId: uuid("user_id").notNull(),
   postId: integer("post_id").notNull(),
-  createdAt: timestamp("created_at", {
-    withTimezone: true,
-  })
-    .notNull()
-    .defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 })
 
 export const postUpvotesRelations = relations(postUpvotesTable, ({ one }) => ({
@@ -25,11 +21,7 @@ export const commentUpvotesTable = schema.table("comment_upvotes", {
   id: serial("id").primaryKey(),
   userId: uuid("user_id").notNull(),
   commentId: integer("comment_id").notNull(),
-  createdAt: timestamp("created_at", {
-    withTimezone: true,
-  })
-    .notNull()
-    .defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 })
 
 export const commentUpvotesRelations = relations(commentUpvotesTable, ({ one }) => ({

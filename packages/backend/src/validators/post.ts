@@ -1,5 +1,5 @@
 import { insertPostSchema } from "../drizzle/schema/posts"
-import type { z } from "zod"
+import type { z } from "zod/v3"
 
 export const createPostSchema = insertPostSchema
   .pick({
