@@ -5,7 +5,7 @@ import { userTable } from "../schema/auth"
 import { postUpvotesTable } from "../schema/upvotes"
 import { commentsTable } from "../schema/comments"
 import { createInsertSchema } from "drizzle-zod"
-import { z } from "zod"
+import { z } from "zod/v4"
 
 export const postsTable = schema.table("posts", {
   id: serial("id").primaryKey(),
@@ -24,7 +24,7 @@ export const postsTable = schema.table("posts", {
 
 export const insertPostSchema = createInsertSchema(postsTable, {
   title: z.string().min(3, { message: "Title should have at least 3 characters." }),
-  url: z.string().trim().url({ message: "URL must be valid." }).optional().or(z.literal("")),
+  url: z.url({ message: "URL must be valid." }).optional().or(z.literal("")),
   content: z.string().optional(),
 })
 
