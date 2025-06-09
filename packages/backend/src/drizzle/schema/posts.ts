@@ -29,11 +29,7 @@ export const insertPostSchema = createInsertSchema(postsTable, {
 })
 
 export const postRelations = relations(postsTable, ({ one, many }) => ({
-  author: one(userTable, {
-    fields: [postsTable.userId],
-    references: [userTable.id],
-    relationName: "author",
-  }),
-  postUpvotes: many(postUpvotesTable, { relationName: "postUpvotes" }),
+  author: one(userTable, { fields: [postsTable.userId], references: [userTable.id] }),
+  postUpvotes: many(postUpvotesTable),
   comments: many(commentsTable),
 }))

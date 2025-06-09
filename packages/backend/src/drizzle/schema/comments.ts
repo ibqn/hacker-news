@@ -24,24 +24,11 @@ export const commentsTable = schema.table("comments", {
 })
 
 export const commentRelations = relations(commentsTable, ({ one, many }) => ({
-  author: one(userTable, {
-    fields: [commentsTable.userId],
-    references: [userTable.id],
-    relationName: "author",
-  }),
-  parentComment: one(commentsTable, {
-    fields: [commentsTable.parentCommentId],
-    references: [commentsTable.id],
-    relationName: "childComments",
-  }),
-  childComments: many(commentsTable, {
-    relationName: "childComments",
-  }),
-  post: one(postsTable, {
-    fields: [commentsTable.postId],
-    references: [postsTable.id],
-  }),
-  commentUpvotes: many(commentUpvotesTable, { relationName: "commentUpvotes" }),
+  author: one(userTable, { fields: [commentsTable.userId], references: [userTable.id] }),
+  parentComment: one(commentsTable, { fields: [commentsTable.parentCommentId], references: [commentsTable.id] }),
+  childComments: many(commentsTable),
+  post: one(postsTable, { fields: [commentsTable.postId], references: [postsTable.id] }),
+  commentUpvotes: many(commentUpvotesTable),
 }))
 
 export const insertCommentSchema = createInsertSchema(commentsTable, {

@@ -17,16 +17,8 @@ export const postUpvotesTable = schema.table("post_upvotes", {
 })
 
 export const postUpvotesRelations = relations(postUpvotesTable, ({ one }) => ({
-  post: one(postsTable, {
-    fields: [postUpvotesTable.postId],
-    references: [postsTable.id],
-    relationName: "postUpvotes",
-  }),
-  user: one(userTable, {
-    fields: [postUpvotesTable.userId],
-    references: [userTable.id],
-    relationName: "user",
-  }),
+  post: one(postsTable, { fields: [postUpvotesTable.postId], references: [postsTable.id] }),
+  user: one(userTable, { fields: [postUpvotesTable.userId], references: [userTable.id] }),
 }))
 
 export const commentUpvotesTable = schema.table("comment_upvotes", {
@@ -41,14 +33,6 @@ export const commentUpvotesTable = schema.table("comment_upvotes", {
 })
 
 export const commentUpvotesRelations = relations(commentUpvotesTable, ({ one }) => ({
-  post: one(commentsTable, {
-    fields: [commentUpvotesTable.commentId],
-    references: [commentsTable.id],
-    relationName: "commentUpvotes",
-  }),
-  user: one(userTable, {
-    fields: [commentUpvotesTable.userId],
-    references: [userTable.id],
-    relationName: "user",
-  }),
+  post: one(commentsTable, { fields: [commentUpvotesTable.commentId], references: [commentsTable.id] }),
+  user: one(userTable, { fields: [commentUpvotesTable.userId], references: [userTable.id] }),
 }))
