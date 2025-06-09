@@ -77,7 +77,7 @@ function Signin() {
 
   return (
     <div className="flex flex-1 items-center justify-center">
-      <Card className="mx-auto max-w-sm grow border-border/25">
+      <Card className="border-border/25 mx-auto max-w-sm grow">
         <CardHeader>
           <CardTitle className="text-center">Sign in</CardTitle>
           <CardDescription className="text-center">
@@ -129,7 +129,7 @@ function Signin() {
               selector={(state) => [state.errorMap]}
               children={([errorMap]) =>
                 errorMap.onSubmit ? (
-                  <p className="text-sm font-medium text-destructive">
+                  <p className="text-destructive text-sm font-medium">
                     {errorMap.onSubmit?.toString()}
                   </p>
                 ) : null
