@@ -12,9 +12,11 @@ import { prettyJSON } from "hono/pretty-json"
 import { postRoute } from "@/routes/posts"
 import { commentRoute } from "@/routes/comments"
 import { getSessionCookieOptions, sessionCookieName } from "./cookie"
+import { logger } from "hono/logger"
 
 const app = new Hono<Context>()
 
+app.use(logger())
 app.use(prettyJSON())
 
 app.notFound((c) => c.json<ErrorResponse>({ error: "Not Found", success: false }, 404))
@@ -51,8 +53,6 @@ export const routes = app
   .route("/comments", commentRoute)
 
 app.onError((error, c) => {
-  // console.error(error)
-
   if (error instanceof HTTPException) {
     const errorResponse =
       error.res ??
@@ -67,6 +67,7 @@ app.onError((error, c) => {
     return errorResponse
   }
 
+  console.error(error)
   return c.json<ErrorResponse>({ success: false, error: getErrorMessage(error) }, 500)
 })
 
