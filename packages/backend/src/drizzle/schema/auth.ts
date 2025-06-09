@@ -9,18 +9,14 @@ export const userTable = schema.table("user", {
   id: uuid("id").primaryKey().defaultRandom(),
   username: text("username").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
-  createdAt: timestamp("created_at", {
-    withTimezone: true,
-  })
-    .notNull()
-    .defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 })
 
 export const userRelations = relations(userTable, ({ many }) => ({
-  posts: many(postsTable, { relationName: "author" }),
-  comments: many(commentsTable, { relationName: "author" }),
-  postUpvotes: many(postUpvotesTable, { relationName: "postUpvotes" }),
-  commentUpvotes: many(commentUpvotesTable, { relationName: "commentUpvotes" }),
+  posts: many(postsTable),
+  comments: many(commentsTable),
+  postUpvotes: many(postUpvotesTable),
+  commentUpvotes: many(commentUpvotesTable),
 }))
 
 export const sessionTable = schema.table("session", {
@@ -28,9 +24,7 @@ export const sessionTable = schema.table("session", {
   userId: uuid("user_id")
     .notNull()
     .references(() => userTable.id, { onDelete: "cascade" }),
-  expiresAt: timestamp("expires_at", {
-    withTimezone: true,
-  }).notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
 })
 
 export const sessionRelations = relations(sessionTable, ({ one }) => ({

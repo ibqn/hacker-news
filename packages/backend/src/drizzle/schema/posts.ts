@@ -9,17 +9,17 @@ import { z } from "zod"
 
 export const postsTable = schema.table("posts", {
   id: serial("id").primaryKey(),
-  userId: uuid("user_id").notNull(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => userTable.id, {
+      onDelete: "cascade",
+    }),
   title: text("title").notNull(),
   url: text("url"),
   content: text("content"),
   points: integer("points").notNull().default(0),
   commentCount: integer("comment_count").notNull().default(0),
-  createdAt: timestamp("created_at", {
-    withTimezone: true,
-  })
-    .notNull()
-    .defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 })
 
 export const insertPostSchema = createInsertSchema(postsTable, {
