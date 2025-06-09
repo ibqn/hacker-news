@@ -15,7 +15,7 @@ import { useState } from 'react'
 export const Header = () => {
   const [open, setOpen] = useState(false)
   return (
-    <header className="sticky top-0 z-50 w-full border-border/40 bg-primary/95 backdrop-blur supports-[backdrop-filter]:bg-primary/90">
+    <header className="sticky top-0 z-50 w-full border-border/40 bg-primary/95 backdrop-blur-sm supports-backdrop-filter:bg-primary/90">
       <div className="container mx-auto flex items-center justify-between p-4 text-primary-foreground">
         <div className="flex grow items-center space-x-4">
           <Link to="/" className="justify-between font-bold">
