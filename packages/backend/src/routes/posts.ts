@@ -4,7 +4,7 @@ import { getCommentsCountForPost, getCommentsForPost, type Comment, createCommen
 import { createPost, getPost, getPosts, getPostsCount, type Post } from "@/queries/post"
 import { createPostUpvote, type UpvoteData } from "@/queries/upvote"
 import { type PaginatedSuccessResponse, type SuccessResponse } from "@/shared/types"
-import type { Context } from "@/utils/context"
+import type { ExtEnv } from "@/utils/extended-env"
 import { createCommentSchema } from "@/validators/comment"
 import { commentsPaginationSchema, paginationSchema } from "@/validators/pagination"
 import { paramIdSchema } from "@/validators/param"
@@ -13,7 +13,7 @@ import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
 import { HTTPException } from "hono/http-exception"
 
-export const postRoute = new Hono<Context>()
+export const postRoute = new Hono<ExtEnv>()
   .post("/", signedIn, zValidator("form", createPostSchema), async (c) => {
     const { title, url, content } = c.req.valid("form")
     const user = c.get("user") as User

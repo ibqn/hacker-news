@@ -3,7 +3,7 @@ import { Hono } from "hono"
 import { HTTPException } from "hono/http-exception"
 import type { ErrorResponse, SuccessResponse } from "@/shared/types"
 import { getErrorMessage, isFormError } from "@/utils/error"
-import type { Context } from "@/utils/context"
+import type { ExtEnv } from "@/utils/extended-env"
 import { validateSessionToken } from "@/lucia"
 import { deleteCookie, getCookie, setCookie } from "hono/cookie"
 import { authRoute } from "@/routes/auth"
@@ -14,7 +14,7 @@ import { commentRoute } from "@/routes/comments"
 import { getSessionCookieOptions, sessionCookieName } from "./cookie"
 import { logger } from "hono/logger"
 
-const app = new Hono<Context>()
+const app = new Hono<ExtEnv>()
 
 app.use(logger())
 app.use(prettyJSON())

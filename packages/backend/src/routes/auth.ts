@@ -1,4 +1,4 @@
-import type { Context } from "@/utils/context"
+import type { ExtEnv } from "@/utils/extended-env"
 import { Hono } from "hono"
 import { zValidator } from "@hono/zod-validator"
 import { signinSchema } from "@/validators/signin"
@@ -13,7 +13,7 @@ import { HTTPException } from "hono/http-exception"
 import { signedIn } from "@/middleware/signed-in"
 import { getSessionCookieOptions, sessionCookieName } from "@/cookie"
 
-const authRoute = new Hono<Context>()
+const authRoute = new Hono<ExtEnv>()
   .post("/signup", zValidator("form", signinSchema), async (c) => {
     const { username, password } = c.req.valid("form")
 

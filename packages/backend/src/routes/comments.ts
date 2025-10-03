@@ -9,14 +9,14 @@ import {
 } from "@/queries/comment"
 import { createCommentUpvote, type UpvoteData } from "@/queries/upvote"
 import { type PaginatedSuccessResponse, type SuccessResponse } from "@/shared/types"
-import type { Context } from "@/utils/context"
+import type { ExtEnv } from "@/utils/extended-env"
 import { createCommentSchema } from "@/validators/comment"
 import { commentQuerySchema, commentsPaginationSchema } from "@/validators/pagination"
 import { paramIdSchema } from "@/validators/param"
 import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
 
-export const commentRoute = new Hono<Context>()
+export const commentRoute = new Hono<ExtEnv>()
   .post("/:id", signedIn, zValidator("param", paramIdSchema), zValidator("form", createCommentSchema), async (c) => {
     const { content } = c.req.valid("form")
     const { id } = c.req.valid("param")
