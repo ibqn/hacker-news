@@ -1,6 +1,6 @@
 import { fallback } from '@tanstack/router-zod-adapter'
 import { orderSchema, sortedBySchema } from 'backend/src/validators/pagination'
-import { z } from 'zod/v3'
+import { z } from 'zod'
 
 const optionalStringSchema = z.string().optional()
 

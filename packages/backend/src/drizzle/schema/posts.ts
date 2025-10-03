@@ -5,7 +5,7 @@ import { userTable } from "../schema/auth"
 import { postUpvotesTable } from "../schema/upvotes"
 import { commentsTable } from "../schema/comments"
 import { createInsertSchema } from "drizzle-zod"
-import { z } from "zod/v3"
+import { z } from "zod"
 
 export const postsTable = schema.table("posts", {
   id: serial("id").primaryKey(),
