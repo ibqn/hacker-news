@@ -9,21 +9,21 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@hono/node-server": "^1.19.5",
-    "@hono/zod-validator": "^0.7.3",
+    "@hono/node-server": "^1.19.9",
+    "@hono/zod-validator": "^0.7.6",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
     "argon2": "^0.44.0",
-    "drizzle-orm": "^0.44.6",
+    "drizzle-orm": "^0.45.1",
     "drizzle-zod": "~0.8.3",
-    "hono": "^4.9.9",
-    "postgres": "^3.4.7",
-    "zod": "^4.1.11"
+    "hono": "^4.11.7",
+    "postgres": "^3.4.8",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/node": "^24.6.2",
-    "drizzle-kit": "^0.31.5",
-    "tsx": "^4.20.6",
+    "@types/node": "^25.2.0",
+    "drizzle-kit": "^0.31.8",
+    "tsx": "^4.21.0",
     "typescript": "~5.9.3"
   }
 }
